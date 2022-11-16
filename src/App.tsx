@@ -1,26 +1,14 @@
-import React from 'react';
-import logo from './logo.svg';
+// import React, { useState } from 'react';
 import './App.css';
+import { Sudoku } from './Game/Sudoku';
 
 function App() {
+  const boardString = "000650007517000000800090010004100000103000705000006900090000006000000354600025000";
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='App'>
+      <Sudoku init={boardString}/>
     </div>
-  );
+  )
 }
 
 export default App;
