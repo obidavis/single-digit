@@ -1,4 +1,5 @@
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEraser, faUndo, faRedo, faPencilAlt } from '@fortawesome/free-solid-svg-icons';
 
 type NoteToggleProps = {
   selected: boolean;
@@ -13,7 +14,7 @@ function NoteToggle(props: NoteToggleProps) {
           (props.selected ? ' selected' : '')}
         onClick={props.onClick}
       >
-        Note
+      <FontAwesomeIcon icon={faPencilAlt} />
       </button>
     </div>
   )
@@ -32,7 +33,7 @@ function UndoButton(props: GenericButtonProps) {
         (!props.valid ? ' invalid' : '')}
         onClick={props.onClick}
       >
-        Undo
+        <FontAwesomeIcon icon={faUndo} />
       </button>
     </div>
   )
@@ -46,7 +47,7 @@ function RedoButton(props: GenericButtonProps) {
           (!props.valid ? ' invalid' : '')}
         onClick={props.onClick}
       >
-        Redo
+        <FontAwesomeIcon icon={faRedo} />
       </button>
     </div>
   )
@@ -60,7 +61,7 @@ function EraseButton(props: GenericButtonProps) {
           (!props.valid ? ' invalid': '')}
         onClick={props.onClick}
       >
-        Erase
+        <FontAwesomeIcon icon={faEraser} />
       </button>
     </div>
   )
