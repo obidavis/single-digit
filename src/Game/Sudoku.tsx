@@ -137,18 +137,22 @@ function Sudoku(props: SudokuProps) {
       console.log(ev);
       ev.preventDefault();
       let nextIndex = -1;
-      console.log(ev.shiftKey);
-      if (!ev.shiftKey) {
-        const firstValidIndex = selectedCell ? (selectedCell.index + 1) % 81 : -1;
-        nextIndex = cellData.findIndex((cell, index) =>
-          index >= firstValidIndex && cell.value === 0
-        );
+      const openCells = cellData.filter(cell => cell.value === 0);
+      const thisIndex = selectedCell ? selectedCell.index : -1;
+      const nextCell = openCells.find(cell => cell.index > thisIndex);
+      const prevCell = openCells.slice(0).reverse().find(cell => cell.index < thisIndex);
+      if (ev.shiftKey) {
+        if (!prevCell) {
+          setSelectedCell(openCells[openCells.length - 1]);
+        } else {
+          setSelectedCell(prevCell);
+        }
       } else {
-        const lastValidIndex = selectedCell ? (selectedCell.index + 80) % 81 : 81;
-        nextIndex = cellData.slice(0).reverse().findIndex(())
-      }
-      if (nextIndex > -1) {
-        setSelectedCell(cellData[nextIndex]);
+        if (!nextCell) {
+          setSelectedCell(openCells[0]);
+        } else {
+          setSelectedCell(nextCell);
+        }
       }
     };
 
