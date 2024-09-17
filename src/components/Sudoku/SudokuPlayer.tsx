@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Board, BoardProps } from './Board/Board'
-import type { CellData } from './Board/Cell'
-import { Controls, ControlsProps } from './Controls/Controls';
+import { BoardView, BoardViewProps } from './BoardView'
+import { Cell, Board, boardFromString } from '../../models';
+import { Controls, ControlsProps } from './SudokuControls';
 
-type SudokuInit = string | CellData[];
+type SudokuInit = string | Cell[];
 
 type SudokuProps = {
   init: SudokuInit;
@@ -13,27 +13,20 @@ function Sudoku(props: SudokuProps) {
   // Generate fresh state from board string
   // or use previous state from history
   // depending on what is provided
-  const [history, setHistory] = useState<CellData[][]>(
+  const [history, setHistory] = useState<Board[]>(
     typeof (props.init) == 'string'
-      ? [Array.from(props.init).map((value, index) => {
-        return {
-          index: index,
-          value: Number.parseInt(value),
-          candidates: Array(9).fill(false),
-          isUserSubmitted: !(Number.parseInt(value) > 0)
-        }
-      })]
-      : [props.init]
+      ? [boardFromString(props.init)]
+      : [new Board(props.init)]
   );
 
-  const [future, setFuture] = useState<CellData[][]>(Array(0));
+  const [future, setFuture] = useState<Board[]>(Array(0));
 
   // create live copy of the current state
   // that all handlers etc. work from
-  const [cellData] = history.slice(-1);
+  const [board] = history.slice(-1);
 
   // Keep track of which cell is selected for highlighting etc.
-  const [selectedCell, setSelectedCell] = useState<CellData | null>(null);
+  const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
 
   // note mode toggle state
   const [isNoteMode, setIsNoteMode] = useState<boolean>(false);
@@ -47,20 +40,20 @@ function Sudoku(props: SudokuProps) {
       return;
 
     // deep copy
-    let newCellData: CellData[] = JSON.parse(JSON.stringify(cellData));
+    const newBoard = board.clone();
 
-    if (value > -1)
-      // flip the value
-      newCellData[selectedCell.index].candidates[value] =
-        !newCellData[selectedCell.index].candidates[value];
-    else
+    if (value > -1) {
+      newBoard.cells[selectedCell.index].toggleCandidate(value);
+    }
+    else {
       // sentinel value for clear all
-      newCellData[selectedCell.index].candidates = Array(9).fill(false);
+      newBoard.cells[selectedCell.index].candidates = Array(9).fill(false);
+    }
 
-    setHistory(history.concat([newCellData]));
+    setHistory(history.concat([newBoard]));
     setFuture([]);
-    setSelectedCell(newCellData[selectedCell.index]);
-  }, [cellData, history, selectedCell]);
+    setSelectedCell(newBoard.cells[selectedCell.index]);
+  }, [board, history, selectedCell]);
 
   // callback for number selection when in value mode
   const handleValueSubmit = useCallback((value: number) => {
@@ -68,7 +61,7 @@ function Sudoku(props: SudokuProps) {
       return;
 
     // don't update pre-given cells
-    if (!selectedCell.isUserSubmitted)
+    if (selectedCell.isClue)
       return;
 
     // don't clutter history with dupes
@@ -76,24 +69,16 @@ function Sudoku(props: SudokuProps) {
       return;
 
     // deep copy to add to history
-    let newCellData = JSON.parse(JSON.stringify(cellData));
+    const newCellData = board.clone();
     // let newSelectedCell = newCellData[selectedCell.index];
     // set cell state
-    Object.assign(newCellData[selectedCell.index],
-      {
-        value: value,
-        candidates: Array(9).fill(false),
-        isUserSubmitted: true
-      });
-
-    // update highlighting
-    // TODO: isn't the whole point that this happens automatically?
-    // setCurrentSelection(Object.assign({}, currentSelection, {value: value}));
+    console.log(newCellData);
+    newCellData.cells[selectedCell.index].solve(value);
 
     setHistory(history.concat([newCellData]));
     setFuture([]);
-    setSelectedCell(newCellData[selectedCell.index]);
-  }, [cellData, history, selectedCell]);
+    setSelectedCell(newCellData.cells[selectedCell.index]);
+  }, [board, history, selectedCell]);
   const handleErase = useCallback(() => {
     handleValueSubmit(0);
     handleCandidateSubmit(-1);
@@ -105,13 +90,13 @@ function Sudoku(props: SudokuProps) {
 
     if (selectedCell !== null) {
       const [previousState] = history.slice(-2);
-      const previousCell = previousState[selectedCell.index];
+      const previousCell = previousState.cells[selectedCell.index];
       setSelectedCell(previousCell);
     }
 
-    setFuture(future.concat([cellData]));
+    setFuture(future.concat([board]));
     setHistory(history.slice(0, -1));
-  }, [cellData, future, history, selectedCell]);
+  }, [board, future, history, selectedCell]);
 
   const handleRedo = useCallback(() => {
     if (!future)
@@ -119,7 +104,7 @@ function Sudoku(props: SudokuProps) {
 
     if (selectedCell !== null) {
       const [nextState] = future.slice(-1);
-      const nextCell = nextState[selectedCell.index];
+      const nextCell = nextState.cells[selectedCell.index];
       setSelectedCell(nextCell);
     }
     setHistory(history.concat(future.slice(-1)));
@@ -137,7 +122,7 @@ function Sudoku(props: SudokuProps) {
       console.log(ev);
       ev.preventDefault();
       let nextIndex = -1;
-      const openCells = cellData.filter(cell => cell.value === 0);
+      const openCells = board.cells.filter(cell => cell.value === 0);
       const thisIndex = selectedCell ? selectedCell.index : -1;
       const nextCell = openCells.find(cell => cell.index > thisIndex);
       const prevCell = openCells.slice(0).reverse().find(cell => cell.index < thisIndex);
@@ -165,7 +150,7 @@ function Sudoku(props: SudokuProps) {
         const newCol = ((col + x) + 9) % 9;
         const newRow = ((row + y) + 9) % 9;
         const newIndex = newCol + (newRow * 9);
-        setSelectedCell(cellData[newIndex]);
+        setSelectedCell(board.cells[newIndex]);
       }
     }
 
@@ -234,7 +219,7 @@ function Sudoku(props: SudokuProps) {
         console.log(ev);
         break;
     }
-  }, [cellData, handleCandidateSubmit, handleErase, handleNoteToggle, handleRedo, handleUndo, handleValueSubmit, isNoteMode, selectedCell]);
+  }, [board, handleCandidateSubmit, handleErase, handleNoteToggle, handleRedo, handleUndo, handleValueSubmit, isNoteMode, selectedCell]);
   // keypress handling - basically just calling the same
   // handlers as we pass to the buttons. Pretty random so far
   useEffect(() => {
@@ -248,11 +233,10 @@ function Sudoku(props: SudokuProps) {
 
 
   // Props to pass to board
-  const boardProps: BoardProps =
-  {
-    cellData: cellData,
+  const boardProps: BoardViewProps = {
+    board: board,
     selectedCell: selectedCell,
-    handleCellClick: (cellData: CellData) => setSelectedCell(cellData),
+    onClick: (cellData: Cell) => setSelectedCell(cellData)
   };
 
 
@@ -260,7 +244,7 @@ function Sudoku(props: SudokuProps) {
     isNoteMode: isNoteMode,
     canErase:
       (selectedCell !== null) &&
-      (selectedCell.isUserSubmitted) &&
+      (!selectedCell.isClue) &&
       (selectedCell.value > 0 ||
         selectedCell.candidates.findIndex(value => value) > -1),
     canUndo: history.length > 1,
@@ -282,7 +266,7 @@ function Sudoku(props: SudokuProps) {
   return (
     <div className='sudoku'>
       <div className='board-container'>
-        <Board    {...boardProps} />
+        <BoardView {...boardProps} />
       </div>
       <div className='controls-container'>
         <Controls {...controlsProps} />

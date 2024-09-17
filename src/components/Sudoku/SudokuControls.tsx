@@ -91,3 +91,78 @@ function Buttons(props: ButtonsProps) {
 
 export {Buttons};
 export type {ButtonsProps};
+
+
+type NumberSelectorButtonProps = {
+  value: number;
+  isSelected: boolean;
+  onClick: () => void;
+}
+
+function NumberSelectorButton(props: NumberSelectorButtonProps) {
+  return (
+      <button
+        className={'number-selector-button' + (props.isSelected ? ' selected' : '')}
+        onClick={props.onClick}>
+        {props.value}
+      </button>
+  );
+}
+
+type NumberSelectorProps = {
+  currentSelection: boolean[];
+  onSelectNumber: (value: number) => void;
+}
+
+function NumberSelector(props: NumberSelectorProps) {
+  return (
+    <div className='number-selector'>
+      {Array.from(Array(9).keys()).map((i) => {
+        return (
+          <NumberSelectorButton
+            key={i}
+            value={i + 1}
+            isSelected={props.currentSelection[i]}
+            onClick={() => props.onSelectNumber(i)} />
+        );
+      })}
+    </div>
+  );
+}
+export { NumberSelector };
+export type { NumberSelectorProps };
+
+type ControlsProps = {
+  isNoteMode: boolean;
+  canUndo: boolean;
+  canRedo: boolean;
+  canErase: boolean;
+  currentSelection: boolean[];
+  onSelectNumber: (value: number) => void;
+  onNoteToggle: () => void;
+  onErase: () => void;
+  onUndo: () => void;
+  onRedo: () => void;
+};
+
+function Controls(props: ControlsProps) {
+  return (
+    <div className='controls'>
+      <NumberSelector
+        currentSelection={props.currentSelection}
+        onSelectNumber={props.onSelectNumber} />
+      <Buttons 
+        isNoteMode={props.isNoteMode}
+        canErase={props.canErase}
+        canUndo={props.canUndo}
+        canRedo={props.canRedo}
+        onErase={props.onErase}
+        onNoteToggle={props.onNoteToggle}
+        onRedo={props.onRedo}
+        onUndo={props.onUndo} />
+    </div>
+  )
+}
+
+export { Controls };
+export type { ControlsProps };
