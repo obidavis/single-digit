@@ -123,7 +123,7 @@ function NumberSelector(props: NumberSelectorProps) {
             key={i}
             value={i + 1}
             isSelected={props.currentSelection[i]}
-            onClick={() => props.onSelectNumber(i)} />
+            onClick={() => props.onSelectNumber(i + 1)} />
         );
       })}
     </div>

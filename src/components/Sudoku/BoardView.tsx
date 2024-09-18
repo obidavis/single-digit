@@ -12,14 +12,14 @@ const boxIndices = Array.from(Array(81).keys()).map((i) => {
 
 export interface BoardViewProps {
   board: Board;
-  selectedCell: Cell | null;
-  onClick: (cell: Cell) => void;
+  selectedIndex: number | null;
+  onCellClick: (cell: Cell) => void;
 }
 
-export const BoardView = ({ board, selectedCell, onClick }: BoardViewProps) => {
-  const selectedRow = selectedCell && indexToRowIndex(selectedCell.index);
-  const selectedCol = selectedCell && indexToColIndex(selectedCell.index);
-  const selectedBox = selectedCell && indexToBoxIndex(selectedCell.index);
+export const BoardView = ({ board, selectedIndex, onCellClick: onClick }: BoardViewProps) => {
+  const selectedRow = selectedIndex && indexToRowIndex(selectedIndex);
+  const selectedCol = selectedIndex && indexToColIndex(selectedIndex);
+  const selectedBox = selectedIndex && indexToBoxIndex(selectedIndex);
 
   const cellProps = board.cells.map((cell, index): CellViewProps => {
     // highlighting logic happens here
@@ -28,9 +28,9 @@ export const BoardView = ({ board, selectedCell, onClick }: BoardViewProps) => {
       selectedCol === indexToColIndex(index) ||
       selectedBox === indexToBoxIndex(index);
     
-    if (selectedCell !== null) {
-      const isHighlightedByValue = cell.isSolved() && cell.value === selectedCell.value;
-      const isSelected = cell === selectedCell;
+    if (selectedIndex !== null) {
+      const isHighlightedByValue = cell.isSolved() && cell.value === board.cells[selectedIndex].value;
+      const isSelected = cell.index === selectedIndex;
       return {
         cell: cell,
         isSelected: isSelected,

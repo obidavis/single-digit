@@ -7,7 +7,7 @@ function App() {
   const boardString = "000650007517000000800090010004100000103000705000006900090000006000000354600025000";
   return (
     <div className='App'>
-      <Sudoku init={boardString}/>
+      <Sudoku initialState={boardString} />
     </div>
   )
 }
