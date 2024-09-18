@@ -22,31 +22,20 @@ export const BoardView = ({ board, selectedIndex, onCellClick: onClick }: BoardV
   const selectedBox = selectedIndex && indexToBoxIndex(selectedIndex);
 
   const cellProps = board.cells.map((cell, index): CellViewProps => {
-    // highlighting logic happens here
     const isHighlightedByPosition =
       selectedRow === indexToRowIndex(index) ||
       selectedCol === indexToColIndex(index) ||
       selectedBox === indexToBoxIndex(index);
+    const isHighlightedByValue = selectedIndex !== null && cell.isSolved() && cell.value === board.cells[selectedIndex].value;
+    const isSelected = selectedIndex === index;
     
-    if (selectedIndex !== null) {
-      const isHighlightedByValue = cell.isSolved() && cell.value === board.cells[selectedIndex].value;
-      const isSelected = cell.index === selectedIndex;
-      return {
-        cell: cell,
-        isSelected: isSelected,
-        isHighlightedByValue: isHighlightedByValue,
-        isHighlightedByPosition: isHighlightedByPosition,
-        onClick: onClick,
-      };
-    } else {
-      return {
-        cell: cell,
-        isSelected: false,
-        isHighlightedByValue: false,
-        isHighlightedByPosition: isHighlightedByPosition,
-        onClick: onClick,
-      };
-    }
+    return {
+      cell: cell,
+      isSelected: isSelected,
+      isHighlightedByValue: isHighlightedByValue,
+      isHighlightedByPosition: isHighlightedByPosition,
+      onClick: onClick,
+    };
   }).map((cell, index, array): CellViewProps => (
     // Reorder the cells to go to the right indices if we fill
     // by boxes first (as in here) instead of rows (as in standard board strings).

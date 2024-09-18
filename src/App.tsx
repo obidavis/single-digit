@@ -1,15 +1,74 @@
-// import React, { useState } from 'react';
-import './App.css';
-import { Sudoku } from './components/Sudoku/SudokuPlayer';
+import './App.scss';
+import {
+  Content,
+  Header,
+  HeaderContainer,
+  HeaderMenu,
+  HeaderMenuButton,
+  HeaderMenuItem,
+  HeaderName,
+  HeaderNavigation,
+  HeaderSideNavItems,
+  SideNav,
+  SideNavItems,
+  SkipToContent
+} from '@carbon/react';
+
+
+import { SudokuPage } from './pages/SudokuPage';
+import { SudokuPlayerPage } from './pages/SudokuPlayer';
+import { Home } from './pages';
+import { Link, Route, Routes } from 'react-router-dom';
+import { HeaderContainerRenderProps } from '@carbon/react/lib/components/UIShell/HeaderContainer';
 // import { Sudoku } from './Game/Sudoku';
 
-function App() {
-  const boardString = "000650007517000000800090010004100000103000705000006900090000006000000354600025000";
+function renderUI({ isSideNavExpanded, onClickSideNavExpand }: HeaderContainerRenderProps) {
+  console.log('renderUI', isSideNavExpanded, onClickSideNavExpand);
   return (
-    <div className='App'>
-      <Sudoku initialState={boardString} />
-    </div>
-  )
+    <>
+      <Header>
+        {/* <SkipToContent/> */}
+        <HeaderMenuButton onClick={onClickSideNavExpand} isActive={isSideNavExpanded} aria-expanded={isSideNavExpanded}/>
+        <HeaderName prefix='' href='/'>
+          SingleDigit
+        </HeaderName>
+        <HeaderNavigation>
+          <HeaderMenuItem as={Link} to={"/"}>
+            Home
+          </HeaderMenuItem>
+          <HeaderMenuItem as={Link} to={"/sudoku"}>
+            Sudoku
+          </HeaderMenuItem>
+        </HeaderNavigation>
+      <SideNav 
+        expanded={isSideNavExpanded} 
+        onOverlayClick={onClickSideNavExpand} 
+        onSideNavBlur={onClickSideNavExpand}
+        isPersistent={false}
+        >
+        {isSideNavExpanded && <SideNavItems>
+          <HeaderSideNavItems>
+            <HeaderMenuItem as={Link} to={"/"} onClick={onClickSideNavExpand}>
+              Home
+            </HeaderMenuItem>
+            <HeaderMenuItem as={Link} to={"/sudoku"} onClick={onClickSideNavExpand}>
+              Sudoku
+            </HeaderMenuItem>
+          </HeaderSideNavItems>
+        </SideNavItems>}
+      </SideNav>
+      </Header>
+      <Content className='single-digit-content'>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/sudoku" element={<SudokuPage />} />
+          <Route path="/sudoku/play" element={<SudokuPlayerPage />} />
+        </Routes>
+      </Content>
+    </>
+  );
 }
 
-export default App;
+export const App = () => (
+  <HeaderContainer render={renderUI} />
+)

@@ -1,17 +1,20 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { BoardView, BoardViewProps } from './BoardView'
 import { Cell, Board, boardFromString } from '../../models';
-import { Controls, ControlsProps } from './SudokuControls';
+import { Controls, ControlsProps } from './Controls';
 import { useSudoku } from '../../hooks/useSudoku';
 import { useArrowInput, useNumberInput } from '../../hooks/useSudokuEvents';
 import { indexToRowAndCol, rowAndColToIndex } from '../../utils/sudokuUtils';
+import { useKeyPress } from '../../hooks/useKeyPress';
+import "./Sudoku.scss";
 
-export interface SudokuPlayerProps {
-  initialState: Board | string;
-};
 
-export const SudokuPlayer = ({ initialState }: SudokuPlayerProps) => {
-  const board = typeof (initialState) == 'string' ? boardFromString(initialState) : initialState;
+export interface SudokuParams {
+  initialState: Board;
+}
+
+export const SudokuPlayer = ({ initialState }: SudokuParams) => {
+  // const board = typeof (initialState) == 'string' ? boardFromString(initialState) : initialState;
   const { 
     currentState, 
     selectedIndex,
@@ -23,16 +26,18 @@ export const SudokuPlayer = ({ initialState }: SudokuPlayerProps) => {
     canUndo,
     canRedo,
     canErase  
-  } = useSudoku(board);
+  } = useSudoku(initialState);
 
   const [isNoteMode, setIsNoteMode] = useState(false);
 
+  const currentStateRef = useRef(currentState);
   const selectedIndexRef = useRef(selectedIndex);
   const isNoteModeRef = useRef(isNoteMode);
   const toggleCandidateRef = useRef(toggleCandidate);
   const setCellValueRef = useRef(setCellValue);
 
   useEffect(() => {
+    currentStateRef.current = currentState
     selectedIndexRef.current = selectedIndex;
     isNoteModeRef.current = isNoteMode;
     toggleCandidateRef.current = toggleCandidate;
@@ -58,13 +63,33 @@ export const SudokuPlayer = ({ initialState }: SudokuPlayerProps) => {
     }
   });
 
+  const advanceToNextCell = () => { 
+    const index = selectedIndexRef.current === null ? 0 : selectedIndexRef.current + 1;
+    const reordered = currentStateRef.current.cells.slice(index).concat(currentStateRef.current.cells.slice(0, index));
+    const nextIndex = reordered.findIndex(cell => cell.value === 0);
+    if (nextIndex !== -1) {
+      setSelectedIndex(reordered[nextIndex].index);
+    }
+  }
+
+  const retreatToPrevCell = () => {
+    const index = selectedIndexRef.current === null ? 0 : selectedIndexRef.current;
+    const reordered = currentStateRef.current.cells.slice(index).concat(currentStateRef.current.cells.slice(0, index));
+    const prevIndex = reordered.slice().reverse().findIndex(cell => cell.value === 0);
+    if (prevIndex !== -1) {
+      setSelectedIndex(reordered[reordered.length - prevIndex - 1].index);
+    }
+  };
+  
+  useKeyPress({ targetKey: '.', callback: advanceToNextCell });
+  useKeyPress({ targetKey: ',', callback: retreatToPrevCell });
+
   // Props to pass to board
   const boardProps: BoardViewProps = {
     board: currentState,
     selectedIndex: selectedIndex,
     onCellClick: (cell: Cell) => setSelectedIndex(cell.index)
   };
-
 
   const controlsProps: ControlsProps = {
     isNoteMode: isNoteMode,
