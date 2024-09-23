@@ -1,5 +1,4 @@
 services:
-
   backend:
     image: singledigit-backend
     pull_policy: never
@@ -10,8 +9,6 @@ services:
       target: runner
     ports:
       - 5000:5000
-    # env_file:
-    #   - ./backend/.env
 
   frontend:
     image: singledigit-frontend
@@ -22,4 +19,3 @@ services:
       dockerfile: Dockerfile
     ports:
       - 80:80
-      

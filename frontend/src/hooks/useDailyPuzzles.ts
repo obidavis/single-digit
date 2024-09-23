@@ -27,38 +27,12 @@ const storeDailyPuzzles = (puzzles: DailyPuzzles, date: string) => {
   localStorage.setItem('dailyPuzzles', JSON.stringify(puzzles));
 }
 
-const mockFetchDailyPuzzles = async (date: string): Promise<DailyPuzzles> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const easy = "000800500006109000150070060000090007020000910500004000080900072000240800007003000";
-      const moderate = "070030000030109004009402000008000200004008905091700600000905400900200030000080050";
-      const tough = "000006001030000004000472060300001200704060900001700003080915000900000030200080000";
-      const mockData: DailyPuzzles = {
-        date: date,
-        easy: {
-          clues: easy,
-          solution: easy
-        },
-        moderate: {
-          clues: moderate,
-          solution: moderate
-        },
-        tough: {
-          clues: tough,
-          solution: tough
-        }
-      };
-      resolve(mockData);
-    }, 1000);
-  });
-}
-
 const fetchDailyPuzzles = async (date: string): Promise<DailyPuzzles> => {
   const storedPuzzles = getStoredDailyPuzzles(date);
   if (storedPuzzles) {
     return storedPuzzles;
   }
-  const puzzles = await mockFetchDailyPuzzles(date);
+  const puzzles = await fetch('http://localhost/api/daily-puzzles').then((res) => res.json());
   storeDailyPuzzles(puzzles, date);
   return puzzles;
 }
