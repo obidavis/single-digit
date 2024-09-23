@@ -13,21 +13,21 @@ services:
       - prod
     command: ["gunicorn", "singledigit.app:app", "-w", "4", "-b", "0.0.0.0:5000"]
 
-  # frontend-dev:
-  #   image: node:14
-  #   container_name: singledigit-frontend-dev
-  #   build:
-  #     context: ./frontend
-  #   ports:
-  #     - 3000:3000
-  #   volumes:
-  #     - ./frontend:/app
-  #   working_dir: /app
-  #   command: ["npm", "start"]
-  #   profiles:
-  #     - dev
-  #   environment:
-  #     - CHOKIDAR_USEPOLLING=true
+  frontend-dev:
+    image: node:14
+    container_name: singledigit-frontend-dev
+    build:
+      context: ./frontend
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend:/app
+    working_dir: /app
+    command: ["npm", "start"]
+    profiles:
+      - dev
+    environment:
+      - CHOKIDAR_USEPOLLING=true
 
   frontend-prod:
     image: frontend-prod
