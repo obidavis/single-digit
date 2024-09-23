@@ -1,18 +1,27 @@
-import { useCallback, useState } from "react";
-import { Board } from "../models";
+import { useCallback, useEffect, useState } from "react";
+import { Board } from "../models/Sudoku";
+import { useSavedPuzzles } from "./useSavedPuzzles";
 
 export const useSudokuHistory = (initialState: Board) => {
-  const [history, setHistory] = useState<Board[]>([initialState]);
-  const [index, setIndex] = useState(0);
+  const [currentState, setCurrentState] = useState(initialState);
+  useEffect(() => {
+    setCurrentState(initialState);
+  }, [initialState]);
 
-  const currentState = history[index];
+  const [history, setHistory] = useState<Board[]>([currentState]);
+  const { savePuzzle } = useSavedPuzzles();
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    setCurrentState(history[index]);
+  }, [index, history]);
 
   const makeMove = useCallback((newState: Board) => {
     const newHistory = history.slice(0, index + 1);
     newHistory.push(newState);
     setHistory(newHistory);
     setIndex(index + 1);
-  }, [history, index]);
+    savePuzzle(newState);
+  }, [history, index, savePuzzle]);
 
   const undo = useCallback(() => {
     if (index > 0) {

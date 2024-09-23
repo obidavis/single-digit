@@ -1,29 +1,36 @@
-import { useCallback, useState } from "react";
-import { Cell, Board } from "../models";
+import { useCallback, useEffect, useState } from "react";
+import { Board } from "../models/Sudoku";
 import { useSudokuHistory } from "./useSudokuHistory";
 
 export const useSudoku = (initialState: Board) => {
-  const { currentState, makeMove, undo, redo, canUndo, canRedo } = useSudokuHistory(initialState);
+  
+  const [state, setState] = useState(initialState);
+  useEffect(() => {
+    setState(initialState);
+  }, [initialState]);
+
+  const { currentState, makeMove, undo, redo, canUndo, canRedo } = useSudokuHistory(state);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+
 
   const setCellValue = useCallback((value: number) => {
     if (selectedIndex === null) return;
-    const newBoard = currentState.clone();
+    const newBoard = structuredClone(currentState);
     newBoard.cells[selectedIndex].value = value;
     makeMove(newBoard);
   }, [selectedIndex, currentState, makeMove]);
 
   const setCellCandidates = useCallback((candidates: boolean[]) => {
     if (selectedIndex === null) return;
-    const newBoard = currentState.clone();
+    const newBoard = structuredClone(currentState);
     newBoard.cells[selectedIndex].candidates = candidates;
     makeMove(newBoard);
   }, [selectedIndex, currentState, makeMove]);
 
   const toggleCandidate = useCallback((index: number) => {
     if (selectedIndex === null) return;
-    const newBoard = currentState.clone();
-    newBoard.cells[selectedIndex].toggleCandidate(index);
+    const newBoard = structuredClone(currentState);
+    newBoard.cells[selectedIndex].candidates[index] = !newBoard.cells[selectedIndex].candidates[index];
     makeMove(newBoard);
   }, [selectedIndex, currentState, makeMove]);
 
