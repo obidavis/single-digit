@@ -1,9 +1,9 @@
 import './App.scss';
 import {
+  ClassPrefix,
   Content,
   Header,
   HeaderContainer,
-  HeaderMenu,
   HeaderMenuButton,
   HeaderMenuItem,
   HeaderName,
@@ -11,7 +11,6 @@ import {
   HeaderSideNavItems,
   SideNav,
   SideNavItems,
-  SkipToContent
 } from '@carbon/react';
 
 
@@ -58,7 +57,7 @@ function renderUI({ isSideNavExpanded, onClickSideNavExpand }: HeaderContainerRe
         </SideNavItems>}
       </SideNav>
       </Header>
-      <Content className='single-digit-content'>
+      <Content>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/sudoku" element={<SudokuPage />} />
@@ -70,5 +69,7 @@ function renderUI({ isSideNavExpanded, onClickSideNavExpand }: HeaderContainerRe
 }
 
 export const App = () => (
-  <HeaderContainer render={renderUI} />
+  <ClassPrefix prefix="single-digit">
+    <HeaderContainer render={renderUI} />
+  </ClassPrefix>
 )
