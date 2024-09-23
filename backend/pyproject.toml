@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "singledigit"
+readme = "README.md"
+requires-python = ">=3.11"
+version = "0.0.1"
+dependencies = [
+  "Flask",
+]
+[tool.setuptools.packages.find]
+where = ["src"]
