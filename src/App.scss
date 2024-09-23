@@ -1,4 +1,6 @@
-@use '@carbon/react';
+@use '@carbon/react' with (
+  $prefix: single-digit,
+);
 
 main {
   max-width: 800px;
