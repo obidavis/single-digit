@@ -22,16 +22,15 @@ import { HeaderContainerRenderProps } from '@carbon/react/lib/components/UIShell
 // import { Sudoku } from './Game/Sudoku';
 
 function renderUI({ isSideNavExpanded, onClickSideNavExpand }: HeaderContainerRenderProps) {
-  console.log('renderUI', isSideNavExpanded, onClickSideNavExpand);
   return (
     <>
-      <Header>
+      <Header aria-label='header'>
         {/* <SkipToContent/> */}
-        <HeaderMenuButton onClick={onClickSideNavExpand} isActive={isSideNavExpanded} aria-expanded={isSideNavExpanded}/>
+        <HeaderMenuButton aria-label='Expand menu' onClick={onClickSideNavExpand} isActive={isSideNavExpanded} aria-expanded={isSideNavExpanded}/>
         <HeaderName prefix='' href='/'>
           SingleDigit
         </HeaderName>
-        <HeaderNavigation>
+        <HeaderNavigation aria-label='menu'>
           <HeaderMenuItem as={Link} to={"/"}>
             Home
           </HeaderMenuItem>
@@ -40,6 +39,7 @@ function renderUI({ isSideNavExpanded, onClickSideNavExpand }: HeaderContainerRe
           </HeaderMenuItem>
         </HeaderNavigation>
       <SideNav 
+        aria-label='Side navigation'
         expanded={isSideNavExpanded} 
         onOverlayClick={onClickSideNavExpand} 
         onSideNavBlur={onClickSideNavExpand}
