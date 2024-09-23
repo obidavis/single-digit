@@ -1,4 +1,4 @@
-import { Cell, } from '../../models';
+import { Cell, } from '../../models/Sudoku';
 
 interface CandidateViewProps {
   candidates: boolean[];
@@ -33,10 +33,10 @@ export const CellView = ({ cell, isSelected, isHighlightedByPosition, isHighligh
       + (isSelected              ? ' selected' : '')
       + (isHighlightedByValue    ? ' value-highlighted': '')
       + (isHighlightedByPosition ? ' position-highlighted' : '')
-      + (cell.isClue             ? ' pre-given' : ' user-submited')}
+      + (cell.isClue             ? ' pre-given' : ' user-submitted')}
     onClick={() => onClick(cell)}
     >
-      {cell.isSolved()
+      {cell.value > 0
         ? <div className='number'>{cell.value}</div>
         : <CandidateView candidates={cell.candidates} />}
       {isSelected

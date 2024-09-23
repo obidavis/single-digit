@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { BoardView, BoardViewProps } from './BoardView'
-import { Cell, Board, boardFromString } from '../../models';
+import { Cell, Board } from '../../models/Sudoku';
 import { Controls, ControlsProps } from './Controls';
 import { useSudoku } from '../../hooks/useSudoku';
 import { useArrowInput, useNumberInput } from '../../hooks/useSudokuEvents';
@@ -42,7 +42,7 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
     isNoteModeRef.current = isNoteMode;
     toggleCandidateRef.current = toggleCandidate;
     setCellValueRef.current = setCellValue;
-  }, [selectedIndex, isNoteMode, toggleCandidate, setCellValue]);
+  }, [selectedIndex, isNoteMode, toggleCandidate, setCellValue, currentState]);
 
   const handleNumberInput = useCallback((value: number) => {
     if (isNoteModeRef.current) {

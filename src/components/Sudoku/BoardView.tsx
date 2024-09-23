@@ -1,4 +1,4 @@
-import { Cell, Board } from '../../models';
+import { Cell, Board } from '../../models/Sudoku';
 import { CellView, CellViewProps } from './CellView';
 import { indexToBoxIndex, indexToColIndex, indexToRowIndex } from '../../utils/sudokuUtils';
 
@@ -26,7 +26,7 @@ export const BoardView = ({ board, selectedIndex, onCellClick: onClick }: BoardV
       selectedRow === indexToRowIndex(index) ||
       selectedCol === indexToColIndex(index) ||
       selectedBox === indexToBoxIndex(index);
-    const isHighlightedByValue = selectedIndex !== null && cell.isSolved() && cell.value === board.cells[selectedIndex].value;
+    const isHighlightedByValue = selectedIndex !== null && (cell.value > 0) && cell.value === board.cells[selectedIndex].value;
     const isSelected = selectedIndex === index;
     
     return {

@@ -124,11 +124,11 @@ html, body, #root {
   position: relative;
 }
 
-.cell.user-submitted {
+.cell.user-submitted .number {
   color: var(--user-submitted-value);
 }
 
-.cell.pre-given {
+.cell.pre-given .number {
   color: var(--pre-given-value);
 }
 
