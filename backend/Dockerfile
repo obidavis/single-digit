@@ -8,13 +8,11 @@ RUN pip wheel --no-cache-dir --wheel-dir wheels .
 COPY src src
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir wheels .
 
-FROM python:3.12-slim AS runner
+FROM python:3.12-slim 
 
 WORKDIR /app
 
 COPY --from=builder /app/wheels /wheels
 RUN pip install --no-cache /wheels/* && rm -rf /wheels
 
-EXPOSE 8000
-
-CMD ["gunicorn", "singledigit.app:app", "--bind", "0.0.0.0:5000", "--workers", "4"]
+EXPOSE 5000

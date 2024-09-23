@@ -6,16 +6,38 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-      target: runner
     ports:
       - 5000:5000
+    profiles:
+      - dev
+      - prod
+    command: ["gunicorn", "singledigit.app:app", "-w", "4", "-b", "0.0.0.0:5000"]
 
-  frontend:
-    image: singledigit-frontend
+  # frontend-dev:
+  #   image: node:14
+  #   container_name: singledigit-frontend-dev
+  #   build:
+  #     context: ./frontend
+  #   ports:
+  #     - 3000:3000
+  #   volumes:
+  #     - ./frontend:/app
+  #   working_dir: /app
+  #   command: ["npm", "start"]
+  #   profiles:
+  #     - dev
+  #   environment:
+  #     - CHOKIDAR_USEPOLLING=true
+
+  frontend-prod:
+    image: frontend-prod
     pull_policy: never
-    container_name: singledigit-frontend
+    container_name: singledigit-frontend-prod
     build:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
       - 80:80
+    profiles:
+      - prod
+

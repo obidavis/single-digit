@@ -32,7 +32,7 @@ const fetchDailyPuzzles = async (date: string): Promise<DailyPuzzles> => {
   if (storedPuzzles) {
     return storedPuzzles;
   }
-  const puzzles = await fetch('http://localhost/api/daily-puzzles').then((res) => res.json());
+  const puzzles = await fetch('/api/daily-puzzles').then((res) => res.json());
   storeDailyPuzzles(puzzles, date);
   return puzzles;
 }
