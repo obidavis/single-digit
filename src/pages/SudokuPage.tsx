@@ -1,6 +1,8 @@
-import { Button, ClickableTile, ExpandableTile, FlexGrid, Grid, Tile, TileAboveTheFoldContent, TileBelowTheFoldContent } from "@carbon/react";
+import { Button, ButtonSet, ButtonSkeleton, ClickableTile, ExpandableTile, FlexGrid, Grid, InlineLoading, Loading, Tile, TileAboveTheFoldContent, TileBelowTheFoldContent } from "@carbon/react";
 import { Link } from "react-router-dom";
 import { Library as SudokuLibrary } from "../components/Sudoku/Library";
+import { useDailyPuzzles } from "../hooks/useDailyPuzzles";
+import { InlineLoadingStatuses } from "@carbon/react/lib/components/InlineLoading/InlineLoading";
 
 
 const SudokuUserHistory = () => {
@@ -18,10 +20,37 @@ const SudokuGenerator = () => {
     )
   }
 
+const DailyPuzzlesTile = () => {
+  const { loading, error, dailyPuzzles } = useDailyPuzzles();
+  if (dailyPuzzles === null) {
+    return (
+      <Tile>
+        <h4>Daily Puzzles</h4>
+        <br />
+        <ButtonSet>
+          <ButtonSkeleton />
+          <ButtonSkeleton />
+          <ButtonSkeleton />
+        </ButtonSet>
+      </Tile>
+    );
+  }
+
+  return (
+    <Tile>
+      <h4>Daily Puzzles</h4>
+      <br />
+      <ButtonSet>
+        <Button as={Link} to={`/sudoku/play?board=${dailyPuzzles.easy.clues}`}>Easy</Button>
+        <Button as={Link} to={`/sudoku/play?board=${dailyPuzzles.moderate.clues}`}>Moderate</Button>
+        <Button as={Link} to={`/sudoku/play?board=${dailyPuzzles.tough.clues}`}>Tough</Button>
+      </ButtonSet>
+    </Tile>
+  )
+}
+
+
 export const SudokuPage = () => {
-  const easy = "000800500006109000150070060000090007020000910500004000080900072000240800007003000";
-  const moderate = "070030000030109004009402000008000200004008905091700600000905400900200030000080050";
-  const tough = "000006001030000004000472060300001200704060900001700003080915000900000030200080000";
   return (
     <div>
       <h1>Sudoku</h1>
@@ -32,12 +61,7 @@ export const SudokuPage = () => {
         <h4>Recent</h4>
       </Tile>
       <br />
-      <Tile>
-        <h4>Daily Puzzles</h4>
-        <Link to={`/sudoku/play?board=${easy}`}>Easy</Link>
-        <Link to={`/sudoku/play?board=${moderate}`}>Moderate</Link>
-        <Link to={`/sudoku/play?board=${tough}`}>Tough</Link>
-      </Tile>
+      <DailyPuzzlesTile />
       <br />
       <Tile>
         <h4>Generator</h4>
