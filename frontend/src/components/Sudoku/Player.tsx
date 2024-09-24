@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { BoardView, BoardViewProps } from './BoardView'
 import { Cell, Board } from '../../models/Sudoku';
 import { Controls, ControlsProps } from './Controls';
-import { useSudoku } from '../../hooks/useSudoku';
-import { useArrowInput, useNumberInput } from '../../hooks/useSudokuEvents';
+import { produce } from 'immer';
+import { useHistoryState } from '@uidotdev/usehooks';
 import { indexToRowAndCol, rowAndColToIndex } from '../../utils/sudokuUtils';
-import { useKeyPress } from '../../hooks/useKeyPress';
+import { useSavedPuzzles } from '../../hooks/useSavedPuzzles';
 import "./Sudoku.scss";
 
 
@@ -14,95 +14,136 @@ export interface SudokuParams {
 }
 
 export const SudokuPlayer = ({ initialState }: SudokuParams) => {
-  // const board = typeof (initialState) == 'string' ? boardFromString(initialState) : initialState;
-  const { 
-    currentState, 
-    selectedIndex,
-    setSelectedIndex,
-    setCellValue, 
-    toggleCandidate,
-    undo,
-    redo, 
-    canUndo,
-    canRedo,
-    canErase  
-  } = useSudoku(initialState);
-
+  const { state, undo, redo, canRedo, canUndo, set, clear } = useHistoryState<Board>(initialState);
+  useEffect(() => {
+    clear();
+    set(initialState);
+  }, [initialState, set, clear]);
+  const { savePuzzle } = useSavedPuzzles();
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [isNoteMode, setIsNoteMode] = useState(false);
 
-  const currentStateRef = useRef(currentState);
-  const selectedIndexRef = useRef(selectedIndex);
-  const isNoteModeRef = useRef(isNoteMode);
-  const toggleCandidateRef = useRef(toggleCandidate);
-  const setCellValueRef = useRef(setCellValue);
+  const setCellValue = useCallback((value: number) => {
+    if (selectedIndex !== null) {
+      const newBoard = produce(state, draft => {
+        draft.cells[selectedIndex].value = value;
+        draft.cells[selectedIndex].candidates = Array(9).fill(false);
+      });
+      set(newBoard);
+      savePuzzle(newBoard);
+    }
+  }, [selectedIndex, state, set, savePuzzle]);
 
-  useEffect(() => {
-    currentStateRef.current = currentState
-    selectedIndexRef.current = selectedIndex;
-    isNoteModeRef.current = isNoteMode;
-    toggleCandidateRef.current = toggleCandidate;
-    setCellValueRef.current = setCellValue;
-  }, [selectedIndex, isNoteMode, toggleCandidate, setCellValue, currentState]);
+  const toggleCandidate = useCallback((candidate: number) => {
+    if (selectedIndex !== null) {
+      const newBoard = produce(state, draft => {
+        draft.cells[selectedIndex].value = 0;
+        draft.cells[selectedIndex].candidates[candidate - 1] = !draft.cells[selectedIndex].candidates[candidate - 1];
+      });
+      set(newBoard);
+      savePuzzle(newBoard);
+    }
+  }, [selectedIndex, state, set, savePuzzle]);
 
   const handleNumberInput = useCallback((value: number) => {
-    if (isNoteModeRef.current) {
-      toggleCandidateRef.current(value - 1);
-    } else {
-      setCellValueRef.current(value);
+    if (isNoteMode) {
+      toggleCandidate(value);
     }
-  }, []);
-
-  useNumberInput((value: number) => handleNumberInput(value));
-  useArrowInput((dx: number, dy: number) => {
-    if (selectedIndexRef.current !== null) {
-      const { row, col } = indexToRowAndCol(selectedIndexRef.current);
-      const newRow = (row + dy + 9) % 9;
-      const newCol = (col + dx + 9) % 9;
-      const newIndex = rowAndColToIndex(newRow, newCol);
-      setSelectedIndex(newIndex);
+    else {
+      setCellValue(value);
     }
-  });
+  }, [isNoteMode, setCellValue, toggleCandidate]);
 
-  const advanceToNextCell = () => { 
-    const index = selectedIndexRef.current === null ? 0 : selectedIndexRef.current + 1;
-    const reordered = currentStateRef.current.cells.slice(index).concat(currentStateRef.current.cells.slice(0, index));
+  const eraseCell = useCallback(() => {
+    if (selectedIndex !== null) {
+      const newBoard = produce(state, draft => {
+        const cell = draft.cells[selectedIndex];
+        if (!cell.isClue) {
+          cell.value = 0;
+          cell.candidates = Array(9).fill(false);
+        }
+      });
+      set(newBoard);
+    }
+  }, [selectedIndex, state, set]);
+
+  const handleNoteModeToggle = useCallback(() => {
+    setIsNoteMode(!isNoteMode);
+  }, [isNoteMode]);
+
+  const advanceToNextCell = useCallback(() => { 
+    const index = selectedIndex === null ? 0 : selectedIndex + 1;
+    const reordered = state.cells.slice(index).concat(state.cells.slice(0, index));
     const nextIndex = reordered.findIndex(cell => cell.value === 0);
     if (nextIndex !== -1) {
       setSelectedIndex(reordered[nextIndex].index);
     }
-  }
+  }, [selectedIndex, state]);
 
-  const retreatToPrevCell = () => {
-    const index = selectedIndexRef.current === null ? 0 : selectedIndexRef.current;
-    const reordered = currentStateRef.current.cells.slice(index).concat(currentStateRef.current.cells.slice(0, index));
+  const retreatToPrevCell = useCallback(() => {
+    const index = selectedIndex === null ? 0 : selectedIndex;
+    const reordered = state.cells.slice(index).concat(state.cells.slice(0, index));
     const prevIndex = reordered.slice().reverse().findIndex(cell => cell.value === 0);
     if (prevIndex !== -1) {
       setSelectedIndex(reordered[reordered.length - prevIndex - 1].index);
     }
-  };
-  
-  useKeyPress({ targetKey: '.', callback: advanceToNextCell });
-  useKeyPress({ targetKey: ',', callback: retreatToPrevCell });
+  }, [selectedIndex, state]);
 
-  // Props to pass to board
+  useEffect(() => {
+    const keyDownHandler = (event: KeyboardEvent) => {
+      if (event.key >= '1' && event.key <= '9') {
+        handleNumberInput(parseInt(event.key));
+      } else if (event.key === 'Backspace' || event.key === 'Delete') {
+        eraseCell();
+      } else if (event.key === '.') {
+        advanceToNextCell();
+      } else if (event.key === ',') {
+        retreatToPrevCell();
+      } else if (event.key === 'n') {
+        handleNoteModeToggle();
+      } else if (event.key === 'z' && event.ctrlKey) {
+        undo();
+      } else if (event.key === 'y' && event.ctrlKey) {
+        redo();
+      } else if (selectedIndex !== null) {
+        let { row, col } = indexToRowAndCol(selectedIndex);
+        if (event.key === 'ArrowLeft') {
+          col = (col + 8) % 9;
+        } else if (event.key === 'ArrowRight') {
+          col = (col + 1) % 9;
+        } else if (event.key === 'ArrowUp') {
+          event.preventDefault();
+          row = (row + 8) % 9;
+        } else if (event.key === 'ArrowDown') {
+          event.preventDefault();
+          row = (row + 1) % 9;
+        }
+        setSelectedIndex(rowAndColToIndex(row, col));
+      }
+    };
+
+    window.addEventListener('keydown', keyDownHandler);
+
+    return () => window.removeEventListener('keydown', keyDownHandler);
+  }, [eraseCell, handleNumberInput, advanceToNextCell, retreatToPrevCell, handleNoteModeToggle, selectedIndex, setSelectedIndex, undo, redo]);
+
   const boardProps: BoardViewProps = {
-    board: currentState,
+    board: state,
     selectedIndex: selectedIndex,
     onCellClick: (cell: Cell) => setSelectedIndex(cell.index)
   };
 
+  const currentSelection = selectedIndex !== null ? state.cells[selectedIndex].candidates : Array(9).fill(false);
+
   const controlsProps: ControlsProps = {
     isNoteMode: isNoteMode,
-    canErase: canErase,
+    canErase: true,
     canUndo: canUndo,
     canRedo: canRedo,
-    currentSelection: // candidates if we have a valid, unsolved selected cell, otherwise blank
-      (selectedIndex !== null && currentState.cells[selectedIndex].value === 0)
-        ? currentState.cells[selectedIndex].candidates
-        : Array(9).fill(false),
+    currentSelection: currentSelection,
     onSelectNumber: handleNumberInput,
-    onErase: () => handleNumberInput(0),
-    onNoteToggle: () => setIsNoteMode(!isNoteMode),
+    onErase: eraseCell,
+    onNoteToggle: handleNoteModeToggle,
     onRedo: redo,
     onUndo: undo
   };

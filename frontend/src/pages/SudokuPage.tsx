@@ -1,27 +1,10 @@
-import { Button, ButtonSet, ButtonSkeleton, ClickableTile, ExpandableTile, FlexGrid, Grid, InlineLoading, Loading, Tile, TileAboveTheFoldContent, TileBelowTheFoldContent } from "@carbon/react";
+import { Button, ButtonSet, ButtonSkeleton, Tile } from "@carbon/react";
 import { Link } from "react-router-dom";
-import { Library as SudokuLibrary } from "../components/Sudoku/Library";
 import { useDailyPuzzles } from "../hooks/useDailyPuzzles";
-import { InlineLoadingStatuses } from "@carbon/react/lib/components/InlineLoading/InlineLoading";
 
-
-const SudokuUserHistory = () => {
-  return (
-    <p>Nothing yet</p>
-  );
-}
-
-const SudokuGenerator = () => {
-    return (
-      <div>
-        <Button>Generate</Button>
-        <Button>Save</Button>
-      </div>
-    )
-  }
 
 const DailyPuzzlesTile = () => {
-  const { loading, error, dailyPuzzles } = useDailyPuzzles();
+  const { dailyPuzzles } = useDailyPuzzles();
   if (dailyPuzzles === null) {
     return (
       <Tile>

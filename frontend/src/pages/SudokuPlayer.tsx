@@ -1,22 +1,21 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { SudokuPlayer } from "../components/Sudoku/Player";
-import { useDailyPuzzles } from "../hooks/useDailyPuzzles";
-import { Loading, Modal } from "@carbon/react";
+import { Modal } from "@carbon/react";
 import { boardFromString, boardToShortString, validateBoardString } from "../utils/sudokuUtils";
 import { Error } from "../components/Error";
-import { useSavedPuzzles, SavedPuzzles } from "../hooks/useSavedPuzzles";
+import { useSavedPuzzles } from "../hooks/useSavedPuzzles";
 import { useCallback, useEffect, useState } from "react";
 
-const getMostRecentlyPlayed = (savedPuzzles: SavedPuzzles): string | null => {
-  const keys = Object.keys(savedPuzzles);
-  if (keys.length === 0) {
-    return null;
-  }
-  keys.sort((a, b) => {
-    return savedPuzzles[b].lastPlayed - savedPuzzles[a].lastPlayed;
-  });
-  return keys[0];
-}
+// const getMostRecentlyPlayed = (savedPuzzles: SavedPuzzles): string | null => {
+//   const keys = Object.keys(savedPuzzles);
+//   if (keys.length === 0) {
+//     return null;
+//   }
+//   keys.sort((a, b) => {
+//     return savedPuzzles[b].lastPlayed - savedPuzzles[a].lastPlayed;
+//   });
+//   return keys[0];
+// }
 
 export const SudokuPlayerPage = () => {
   const location = useLocation();

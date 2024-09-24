@@ -52,7 +52,12 @@ export const useSavedPuzzles = () => {
     setSavedPuzzles(getSavedPuzzles());
   }, []);
 
-  return { savedPuzzles, savePuzzle, removePuzzle };
+  const clearSavedPuzzles = useCallback(() => {
+    clearSavedPuzzlesFromStorage();
+    setSavedPuzzles({});
+  }, []);
+
+  return { savedPuzzles, savePuzzle, removePuzzle, clearSavedPuzzles };
 }
 
 
