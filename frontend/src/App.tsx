@@ -16,6 +16,7 @@ import {
 
 import { SudokuPage } from './pages/SudokuPage';
 import { SudokuPlayerPage } from './pages/SudokuPlayer';
+import { SudokuHistoryPage } from './pages/SudokuHistory';
 import { Home } from './pages';
 import { Link, Route, Routes } from 'react-router-dom';
 import { HeaderContainerRenderProps } from '@carbon/react/lib/components/UIShell/HeaderContainer';
@@ -36,6 +37,9 @@ function renderUI({ isSideNavExpanded, onClickSideNavExpand }: HeaderContainerRe
           </HeaderMenuItem>
           <HeaderMenuItem as={Link} to={"/sudoku"}>
             Sudoku
+          </HeaderMenuItem>
+          <HeaderMenuItem as={Link} to={"/sudoku/history"}>
+            History
           </HeaderMenuItem>
         </HeaderNavigation>
       <SideNav 
@@ -62,6 +66,7 @@ function renderUI({ isSideNavExpanded, onClickSideNavExpand }: HeaderContainerRe
           <Route path="/" element={<Home />} />
           <Route path="/sudoku" element={<SudokuPage />} />
           <Route path="/sudoku/play" element={<SudokuPlayerPage />} />
+          <Route path="/sudoku/history" element={<SudokuHistoryPage />} />
         </Routes>
       </Content>
     </>
