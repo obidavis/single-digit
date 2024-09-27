@@ -17,6 +17,7 @@ import {
 import { SudokuPage } from './pages/SudokuPage';
 import { SudokuPlayerPage } from './pages/SudokuPlayer';
 import { SudokuHistoryPage } from './pages/SudokuHistory';
+import { SudokuGeneratorPage } from './pages/SudokuGenerator';
 import { Home } from './pages';
 import { Link, Route, Routes } from 'react-router-dom';
 import { HeaderContainerRenderProps } from '@carbon/react/lib/components/UIShell/HeaderContainer';
@@ -41,6 +42,9 @@ function renderUI({ isSideNavExpanded, onClickSideNavExpand }: HeaderContainerRe
           <HeaderMenuItem as={Link} to={"/sudoku/history"}>
             History
           </HeaderMenuItem>
+          <HeaderMenuItem as={Link} to={"/sudoku/generator"}>
+            Generator
+          </HeaderMenuItem>
         </HeaderNavigation>
       <SideNav 
         aria-label='Side navigation'
@@ -57,6 +61,12 @@ function renderUI({ isSideNavExpanded, onClickSideNavExpand }: HeaderContainerRe
             <HeaderMenuItem as={Link} to={"/sudoku"} onClick={onClickSideNavExpand}>
               Sudoku
             </HeaderMenuItem>
+            <HeaderMenuItem as={Link} to={"/sudoku/history"} onClick={onClickSideNavExpand}>
+              History
+            </HeaderMenuItem>
+            <HeaderMenuItem as={Link} to={"/sudoku/generator"} onClick={onClickSideNavExpand}>
+              Generator
+            </HeaderMenuItem>
           </HeaderSideNavItems>
         </SideNavItems>}
       </SideNav>
@@ -67,6 +77,7 @@ function renderUI({ isSideNavExpanded, onClickSideNavExpand }: HeaderContainerRe
           <Route path="/sudoku" element={<SudokuPage />} />
           <Route path="/sudoku/play" element={<SudokuPlayerPage />} />
           <Route path="/sudoku/history" element={<SudokuHistoryPage />} />
+          <Route path="/sudoku/generator" element={<SudokuGeneratorPage />} />
         </Routes>
       </Content>
     </>

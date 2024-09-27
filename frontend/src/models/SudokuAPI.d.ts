@@ -1,6 +1,7 @@
 declare type Puzzle = {
   clues: number[];
   solution: number[];
+  difficulty: number;
 }
 
 declare type DailyPuzzles = {
