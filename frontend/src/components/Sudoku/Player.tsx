@@ -6,7 +6,6 @@ import { produce } from 'immer';
 import { useHistoryState } from '@uidotdev/usehooks';
 import { indexToRowAndCol, rowAndColToIndex } from '../../utils/sudokuUtils';
 import { useSavedPuzzles } from '../../hooks/useSavedPuzzles';
-import { Column, Row, FlexGrid as Grid } from '@carbon/react';
 
 
 export interface SudokuParams {
@@ -25,6 +24,9 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
 
   const setCellValue = useCallback((value: number) => {
     if (selectedIndex !== undefined) {
+      if (state.cells[selectedIndex].isClue) {
+        return;
+      }
       const newBoard = produce(state, draft => {
         draft.cells[selectedIndex].value = value;
         draft.cells[selectedIndex].candidates = Array(9).fill(false);
@@ -36,6 +38,9 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
 
   const toggleCandidate = useCallback((candidate: number) => {
     if (selectedIndex !== undefined) {
+      if (state.cells[selectedIndex].isClue) {
+        return;
+      }
       const newBoard = produce(state, draft => {
         draft.cells[selectedIndex].value = 0;
         draft.cells[selectedIndex].candidates[candidate - 1] = !draft.cells[selectedIndex].candidates[candidate - 1];
@@ -56,6 +61,9 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
 
   const eraseCell = useCallback(() => {
     if (selectedIndex !== undefined) {
+      if (state.cells[selectedIndex].isClue) {
+        return;
+      }
       const newBoard = produce(state, draft => {
         const cell = draft.cells[selectedIndex];
         if (!cell.isClue) {
@@ -153,9 +161,7 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
       <div className='sudoku-stretch'>
         <BoardView {...boardProps} />
       </div>
-      {/* <div className='controls-container'> */}
         <Controls {...controlsProps} />
-      {/* </div> */}
     </div>
   )
 }
