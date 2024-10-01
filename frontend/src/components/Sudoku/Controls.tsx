@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEraser, faUndo, faRedo, faPencilAlt } from '@fortawesome/free-solid-svg-icons';
-import { ContentSwitcher, Switch, Grid, Row, Column, Stack, Toggle, IconButton, Button } from '@carbon/react';
+import { ContentSwitcher, Switch, Grid, Row, Column, Stack, Toggle, IconButton, Button, Checkbox } from '@carbon/react';
 import { Undo, Redo, Erase } from "@carbon/react/icons" 
 import classNames from 'classnames';
 
@@ -184,22 +184,20 @@ interface NumPadProps {
 }
 
 const NumPad = ({ onSelectNumber, selectedNumbers, canErase, canUndo, canRedo, onErase, onUndo, onRedo, candidateMode }: NumPadProps) => (
-  // <div className='numpad-container'>
-    <div className='numpad'>
-      <NumberButton value={1} onClick={() => onSelectNumber(1)} selected={selectedNumbers[0]} isCandidate={candidateMode}/>
-      <NumberButton value={2} onClick={() => onSelectNumber(2)} selected={selectedNumbers[1]} isCandidate={candidateMode}/>
-      <NumberButton value={3} onClick={() => onSelectNumber(3)} selected={selectedNumbers[2]} isCandidate={candidateMode}/>
-      <ActionButton icon={<Undo />} onClick={onUndo} disabled={!canUndo} />
-      <NumberButton value={4} onClick={() => onSelectNumber(4)} selected={selectedNumbers[3]} isCandidate={candidateMode}/>
-      <NumberButton value={5} onClick={() => onSelectNumber(5)} selected={selectedNumbers[4]} isCandidate={candidateMode}/>
-      <NumberButton value={6} onClick={() => onSelectNumber(6)} selected={selectedNumbers[5]} isCandidate={candidateMode}/>
-      <ActionButton icon={<Redo />} onClick={onRedo} disabled={!canRedo} />
-      <NumberButton value={7} onClick={() => onSelectNumber(7)} selected={selectedNumbers[6]} isCandidate={candidateMode}/>
-      <NumberButton value={8} onClick={() => onSelectNumber(8)} selected={selectedNumbers[7]} isCandidate={candidateMode}/>
-      <NumberButton value={9} onClick={() => onSelectNumber(9)} selected={selectedNumbers[8]} isCandidate={candidateMode}/>
-      <ActionButton icon={<Erase />} onClick={onErase} disabled={!canErase} />
-    </div>
-  // </div>
+  <div className='numpad'>
+    <NumberButton value={1} onClick={() => onSelectNumber(1)} selected={selectedNumbers[0]} isCandidate={candidateMode}/>
+    <NumberButton value={2} onClick={() => onSelectNumber(2)} selected={selectedNumbers[1]} isCandidate={candidateMode}/>
+    <NumberButton value={3} onClick={() => onSelectNumber(3)} selected={selectedNumbers[2]} isCandidate={candidateMode}/>
+    <ActionButton icon={<Undo />} onClick={onUndo} disabled={!canUndo} />
+    <NumberButton value={4} onClick={() => onSelectNumber(4)} selected={selectedNumbers[3]} isCandidate={candidateMode}/>
+    <NumberButton value={5} onClick={() => onSelectNumber(5)} selected={selectedNumbers[4]} isCandidate={candidateMode}/>
+    <NumberButton value={6} onClick={() => onSelectNumber(6)} selected={selectedNumbers[5]} isCandidate={candidateMode}/>
+    <ActionButton icon={<Redo />} onClick={onRedo} disabled={!canRedo} />
+    <NumberButton value={7} onClick={() => onSelectNumber(7)} selected={selectedNumbers[6]} isCandidate={candidateMode}/>
+    <NumberButton value={8} onClick={() => onSelectNumber(8)} selected={selectedNumbers[7]} isCandidate={candidateMode}/>
+    <NumberButton value={9} onClick={() => onSelectNumber(9)} selected={selectedNumbers[8]} isCandidate={candidateMode}/>
+    <ActionButton icon={<Erase />} onClick={onErase} disabled={!canErase} />
+  </div>
 )
 
 export interface ControlsProps {
@@ -209,6 +207,8 @@ export interface ControlsProps {
   canErase: boolean;
   selectedNumbers: boolean[];
   onSelectNumber: (value: number) => void;
+  onToggleAutoCandidates: () => void;
+  autoCandidates?: boolean;
   onNoteToggle: () => void;
   onErase: () => void;
   onUndo: () => void;
@@ -219,8 +219,14 @@ export const Controls = (props: ControlsProps) => (
   <div className='controls'>
     <ContentSwitcher onChange={props.onNoteToggle} selectedIndex={props.candidateMode ? 1 : 0} size="sm" className='note-mode-switcher'>
       <Switch name="normalInput" text='Normal' style={{ justifyContent: "center" }}/>
-      <Switch name="noteInput" text='Note' style={{ justifyContent: 'center' }} />
+      <Switch name="candidateInput" text='Candidate' style={{ justifyContent: 'center' }} />
     </ContentSwitcher>
     <NumPad {...props} />
+    <Toggle 
+      id="auto-candidates" 
+      labelText='Auto Candidates' hideLabel
+      size='sm'
+      onClick={props.onToggleAutoCandidates}
+      />
   </div>
 )

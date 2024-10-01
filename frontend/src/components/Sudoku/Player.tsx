@@ -4,12 +4,17 @@ import { Cell, Board } from '../../models/Sudoku';
 import { Controls, ControlsProps } from './Controls';
 import { produce } from 'immer';
 import { useHistoryState } from '@uidotdev/usehooks';
-import { indexToRowAndCol, rowAndColToIndex } from '../../utils/sudokuUtils';
+import { indexToBoxIndex, indexToRowAndCol, indexToRowIndex, rowAndColToIndex, indexToColIndex } from '../../utils/sudokuUtils';
 import { useSavedPuzzles } from '../../hooks/useSavedPuzzles';
 
 
 export interface SudokuParams {
   initialState: Board;
+}
+
+interface InProgressPuzzle {
+  state: Board;
+
 }
 
 export const SudokuPlayer = ({ initialState }: SudokuParams) => {
@@ -21,6 +26,31 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
   const { savePuzzle } = useSavedPuzzles();
   const [selectedIndex, setSelectedIndex] = useState<number | undefined>(undefined);
   const [isNoteMode, setIsNoteMode] = useState(false);
+  const [autoCandidates, setAutoCandidates] = useState(false);
+
+  const applyAutoCandidates = useCallback(() => {
+    const newBoard = produce(state, draft => {
+      draft.cells.forEach((cell, index) => {
+        if (cell.value !== 0) {
+          const row = indexToRowIndex(index);
+          const col = indexToColIndex(index);
+          const box = indexToBoxIndex(index);
+          draft.cells.forEach((other, otherIndex) => {
+            if (index !== otherIndex) {
+              const otherRow = indexToRowIndex(otherIndex);
+              const otherCol = indexToColIndex(otherIndex);
+              const otherBox = indexToBoxIndex(otherIndex);
+              if (row === otherRow || col === otherCol || box === otherBox) {
+                other.candidates[cell.value - 1] = false;
+              }
+            }
+          });
+        }
+      });
+    });
+    set(newBoard);
+    savePuzzle(newBoard);
+  }, [state, set]);
 
   const setCellValue = useCallback((value: number) => {
     if (selectedIndex !== undefined) {
@@ -153,7 +183,14 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
     onErase: eraseCell,
     onNoteToggle: handleNoteModeToggle,
     onRedo: redo,
-    onUndo: undo
+    onUndo: undo,
+    onToggleAutoCandidates: useCallback(() => {
+      setAutoCandidates(!autoCandidates);
+      if (autoCandidates) {
+        applyAutoCandidates();
+      }
+    }, [autoCandidates, applyAutoCandidates]),
+    autoCandidates: autoCandidates
   };
 
   return (

@@ -54,12 +54,12 @@
   justify-content: center;
   flex-direction: column;
   container-type: size;
+  gap: 2rem;
   @media (orientation: landscape) {
     height: 62vh;
     flex-direction: row;
     align-items: stretch;
     justify-content: center;
-    gap: 2rem;
   }
 
   .sudoku-stretch {
@@ -98,35 +98,37 @@
   flex-direction: column;
   justify-content: end;
   container-type: size;
+  gap: 0.5rem;
   @media (orientation: landscape) {
     justify-content: start;
     max-width: 240px;
   }
 
+  div {
+    margin: 0 auto;
+  }
+
   .note-mode-switcher {
     width: 80%;
-    margin: 0 auto;
   }
   
   .numpad {
-    margin: 0 auto;
-    margin-top: 10px;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(3, 1fr);
-    gap: 1px;
     width: min(100cqh, 100cqw);
+    gap: 2px;
 
+    
     button {
       aspect-ratio: 1;
       margin: auto;
       background-color: var(--button-bg);
       color: var(--button-text);
       border: none;
-      border-radius: 2.5%;
+      border-radius: 10%;
       font-size: 2em;
       width: 100%;
-      // height: 100%;
       
       &:active {
         background-color: var(--button-selected);
@@ -141,7 +143,6 @@
       }
 
       &.number-button {
-        
         > span {
           user-select: none;
         }
@@ -214,6 +215,7 @@
       }
     }
   }
+
 }
 
 
