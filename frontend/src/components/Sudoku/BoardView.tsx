@@ -1,6 +1,7 @@
 import { Cell, Board } from '../../models/Sudoku';
 import { CellView, CellViewProps } from './CellView';
 import { indexToBoxIndex, indexToColIndex, indexToRowIndex } from '../../utils/sudokuUtils';
+import "./Sudoku.scss";
 
 const boxIndices = Array.from(Array(81).keys()).map((i) => {
   return (
@@ -12,11 +13,11 @@ const boxIndices = Array.from(Array(81).keys()).map((i) => {
 
 export interface BoardViewProps {
   board: Board;
-  selectedIndex: number | null;
-  onCellClick: (cell: Cell) => void;
+  selectedIndex?: number;
+  onCellClick?: (cell: Cell) => void;
 }
 
-export const BoardView = ({ board, selectedIndex, onCellClick: onClick }: BoardViewProps) => {
+export const BoardView = ({ board, selectedIndex, onCellClick: onClick = () => {}}: BoardViewProps) => {
   const selectedRow = selectedIndex && indexToRowIndex(selectedIndex);
   const selectedCol = selectedIndex && indexToColIndex(selectedIndex);
   const selectedBox = selectedIndex && indexToBoxIndex(selectedIndex);
@@ -26,7 +27,7 @@ export const BoardView = ({ board, selectedIndex, onCellClick: onClick }: BoardV
       selectedRow === indexToRowIndex(index) ||
       selectedCol === indexToColIndex(index) ||
       selectedBox === indexToBoxIndex(index);
-    const isHighlightedByValue = selectedIndex !== null && (cell.value > 0) && cell.value === board.cells[selectedIndex].value;
+    const isHighlightedByValue = selectedIndex !== undefined && (cell.value > 0) && cell.value === board.cells[selectedIndex].value;
     const isSelected = selectedIndex === index;
     
     return {
@@ -51,18 +52,20 @@ export const BoardView = ({ board, selectedIndex, onCellClick: onClick }: BoardV
   // from 0-8, render a box with the appropriate
   // slice of the reordered cell props
   return (
-    <div className="board three-by-three">
-      {Array.from(Array(9).keys()).map((boxIndex) => {
-        const begin = boxIndex * 9;
-        const end = begin + 9;
-        return (
-          <div key={boxIndex} className="box three-by-three">
-            {cellProps.slice(begin, end).map((props, cellIndex) => {
-              return <CellView key={cellIndex} {...props} />;
-            })}
-          </div>
-        );
-      })}
-    </div>
+    // <div className='board-container'>
+      <div className="board three-by-three">
+        {Array.from(Array(9).keys()).map((boxIndex) => {
+          const begin = boxIndex * 9;
+          const end = begin + 9;
+          return (
+            <div key={boxIndex} className="box three-by-three">
+              {cellProps.slice(begin, end).map((props, cellIndex) => {
+                return <CellView key={cellIndex} {...props} />;
+              })}
+            </div>
+          );
+        })}
+      </div>
+    // </div>
   );
 }

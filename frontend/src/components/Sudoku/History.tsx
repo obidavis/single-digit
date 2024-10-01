@@ -8,15 +8,15 @@ import {
   TableBody,
   TableCell,
   Button,
-  ButtonSet,
   ProgressBar,
-  IconButton
 } from '@carbon/react';
 import { Play, TrashCan } from '@carbon/icons-react';
 import { Board } from '../../models/Sudoku';
 import { boardFromString } from '../../utils/sudokuUtils';
 import { Link } from 'react-router-dom';
 import { SavedPuzzles } from '../../hooks/useSavedPuzzles';
+import { SudokuCard } from '../SudokuCard';
+import { BoardView } from './BoardView';
 
 interface ActionButtonsProps {
   board: string;
@@ -26,7 +26,7 @@ interface ActionButtonsProps {
 const ActionButtons = ({ board, onRemove }: ActionButtonsProps) => {
   return (
     <>
-      <Button as={Link} to={`/sudoku/play?board=${board}`} renderIcon={Play} hasIconOnly kind="ghost" iconDescription='Play' />
+      <Button as={Link} to={`/play?board=${board}`} renderIcon={Play} hasIconOnly kind="ghost" iconDescription='Play' />
       <Button onClick={onRemove} renderIcon={TrashCan} hasIconOnly kind="danger" iconDescription='Delete'/>
     </>
   )
@@ -43,18 +43,29 @@ export const History = ({ savedPuzzles, onRemove }: SudokuHistoryProps) => {
     const numNonClues = nonClues.length;
     const filled = nonClues.filter(cell => cell.value !== 0).length;
     return Math.floor(filled / numNonClues * 100);
-  }
-  const rows = Object.entries(savedPuzzles).map(([key, value]) => {
-    const board = boardFromString(value.state);
-    const progress = board !== null ? calculateProgress(board) : 0;
-    return {
-      id: key,
-      lastPlayed: new Date(value.lastPlayed).toLocaleString(),
-      progress: <ProgressBar label={`${progress}%`} value={progress} />,
-      actions: <ActionButtons board={value.state} onRemove={() => onRemove(key)}/>
-    };
-  });
+  };
+
+  const rows = Object.entries(savedPuzzles)
+    .map(([key, value]) => {
+      return { id: key, board: boardFromString(value.state) };
+    })
+    .filter(({ board }) => board !== null)
+    .map(({ id, board }) => {
+      const progress = calculateProgress(board!);
+      return {
+        id: id,
+        board: <BoardView board={board!} />,
+        lastPlayed: new Date(savedPuzzles[id].lastPlayed).toLocaleString(),
+        progress: <ProgressBar label={`${progress}%`} value={progress} />,
+        actions: <ActionButtons board={savedPuzzles[id].state} onRemove={() => onRemove(id)} />
+      };
+    });
+
   const headers = [
+    {
+      key: 'board',
+      header: '',
+    },
     {
       key: 'lastPlayed',
       header: 'Last Played'

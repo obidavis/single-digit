@@ -1,9 +1,25 @@
 @use '@carbon/react' with (
+  $use-flexbox-grid: true,
   $prefix: single-digit,
 );
 
+
+body, #root {
+  width: 100%;
+  height: calc(100dvh - 3rem); // 3rem is the height of the header
+}
+
 main {
+  width: 100%;
   max-width: 800px;
+  height: 100%;
   margin: 0 auto;
   padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+main > div {
+  width: 100%;
 }

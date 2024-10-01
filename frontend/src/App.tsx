@@ -18,16 +18,13 @@ import { SudokuPage } from './pages/SudokuPage';
 import { SudokuPlayerPage } from './pages/SudokuPlayer';
 import { SudokuHistoryPage } from './pages/SudokuHistory';
 import { SudokuGeneratorPage } from './pages/SudokuGenerator';
-import { Home } from './pages';
-import { Link, Route, Routes } from 'react-router-dom';
+import { Link, Outlet, Route, Routes } from 'react-router-dom';
 import { HeaderContainerRenderProps } from '@carbon/react/lib/components/UIShell/HeaderContainer';
-// import { Sudoku } from './Game/Sudoku';
 
 function renderUI({ isSideNavExpanded, onClickSideNavExpand }: HeaderContainerRenderProps) {
   return (
     <>
       <Header aria-label='header'>
-        {/* <SkipToContent/> */}
         <HeaderMenuButton aria-label='Expand menu' onClick={onClickSideNavExpand} isActive={isSideNavExpanded} aria-expanded={isSideNavExpanded}/>
         <HeaderName prefix='' href='/'>
           SingleDigit
@@ -36,13 +33,16 @@ function renderUI({ isSideNavExpanded, onClickSideNavExpand }: HeaderContainerRe
           <HeaderMenuItem as={Link} to={"/"}>
             Home
           </HeaderMenuItem>
-          <HeaderMenuItem as={Link} to={"/sudoku"}>
-            Sudoku
+          <HeaderMenuItem as={Link} to={"/about"} >
+            About
           </HeaderMenuItem>
-          <HeaderMenuItem as={Link} to={"/sudoku/history"}>
+          <HeaderMenuItem as={Link} to={"/history"}>
             History
           </HeaderMenuItem>
-          <HeaderMenuItem as={Link} to={"/sudoku/generator"}>
+          <HeaderMenuItem as={Link} to={"/library"}>
+            Library
+          </HeaderMenuItem>
+          <HeaderMenuItem as={Link} to={"/generator"}>
             Generator
           </HeaderMenuItem>
         </HeaderNavigation>
@@ -58,28 +58,22 @@ function renderUI({ isSideNavExpanded, onClickSideNavExpand }: HeaderContainerRe
             <HeaderMenuItem as={Link} to={"/"} onClick={onClickSideNavExpand}>
               Home
             </HeaderMenuItem>
-            <HeaderMenuItem as={Link} to={"/sudoku"} onClick={onClickSideNavExpand}>
-              Sudoku
+            <HeaderMenuItem as={Link} to={"/about"} onClick={onClickSideNavExpand}>
+              About
             </HeaderMenuItem>
-            <HeaderMenuItem as={Link} to={"/sudoku/history"} onClick={onClickSideNavExpand}>
+            <HeaderMenuItem as={Link} to={"/history"} onClick={onClickSideNavExpand}>
               History
             </HeaderMenuItem>
-            <HeaderMenuItem as={Link} to={"/sudoku/generator"} onClick={onClickSideNavExpand}>
+            <HeaderMenuItem as={Link} to={"/library"} onClick={onClickSideNavExpand}>
+              Library
+            </HeaderMenuItem>
+            <HeaderMenuItem as={Link} to={"/generator"} onClick={onClickSideNavExpand}>
               Generator
             </HeaderMenuItem>
           </HeaderSideNavItems>
         </SideNavItems>}
       </SideNav>
       </Header>
-      <Content>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/sudoku" element={<SudokuPage />} />
-          <Route path="/sudoku/play" element={<SudokuPlayerPage />} />
-          <Route path="/sudoku/history" element={<SudokuHistoryPage />} />
-          <Route path="/sudoku/generator" element={<SudokuGeneratorPage />} />
-        </Routes>
-      </Content>
     </>
   );
 }
@@ -87,5 +81,13 @@ function renderUI({ isSideNavExpanded, onClickSideNavExpand }: HeaderContainerRe
 export const App = () => (
   <ClassPrefix prefix="single-digit">
     <HeaderContainer render={renderUI} />
+    <Routes>
+      <Route path="/" element={<SudokuPage />} />
+      <Route path="/play" element={<SudokuPlayerPage />} />
+      <Route path="/about" element={<p>About</p>} />
+      <Route path="/history" element={<SudokuHistoryPage />} />
+      <Route path="/library" element={<p>Library</p>} />
+      <Route path="/generator" element={<SudokuGeneratorPage />} />
+    </Routes>
   </ClassPrefix>
 )

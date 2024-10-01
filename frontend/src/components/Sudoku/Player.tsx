@@ -6,7 +6,7 @@ import { produce } from 'immer';
 import { useHistoryState } from '@uidotdev/usehooks';
 import { indexToRowAndCol, rowAndColToIndex } from '../../utils/sudokuUtils';
 import { useSavedPuzzles } from '../../hooks/useSavedPuzzles';
-import "./Sudoku.scss";
+import { Column, Row, FlexGrid as Grid } from '@carbon/react';
 
 
 export interface SudokuParams {
@@ -20,11 +20,11 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
     set(initialState);
   }, [initialState, set, clear]);
   const { savePuzzle } = useSavedPuzzles();
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | undefined>(undefined);
   const [isNoteMode, setIsNoteMode] = useState(false);
 
   const setCellValue = useCallback((value: number) => {
-    if (selectedIndex !== null) {
+    if (selectedIndex !== undefined) {
       const newBoard = produce(state, draft => {
         draft.cells[selectedIndex].value = value;
         draft.cells[selectedIndex].candidates = Array(9).fill(false);
@@ -35,7 +35,7 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
   }, [selectedIndex, state, set, savePuzzle]);
 
   const toggleCandidate = useCallback((candidate: number) => {
-    if (selectedIndex !== null) {
+    if (selectedIndex !== undefined) {
       const newBoard = produce(state, draft => {
         draft.cells[selectedIndex].value = 0;
         draft.cells[selectedIndex].candidates[candidate - 1] = !draft.cells[selectedIndex].candidates[candidate - 1];
@@ -55,7 +55,7 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
   }, [isNoteMode, setCellValue, toggleCandidate]);
 
   const eraseCell = useCallback(() => {
-    if (selectedIndex !== null) {
+    if (selectedIndex !== undefined) {
       const newBoard = produce(state, draft => {
         const cell = draft.cells[selectedIndex];
         if (!cell.isClue) {
@@ -72,7 +72,7 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
   }, [isNoteMode]);
 
   const advanceToNextCell = useCallback(() => { 
-    const index = selectedIndex === null ? 0 : selectedIndex + 1;
+    const index = selectedIndex === undefined ? 0 : selectedIndex + 1;
     const reordered = state.cells.slice(index).concat(state.cells.slice(0, index));
     const nextIndex = reordered.findIndex(cell => cell.value === 0);
     if (nextIndex !== -1) {
@@ -81,7 +81,7 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
   }, [selectedIndex, state]);
 
   const retreatToPrevCell = useCallback(() => {
-    const index = selectedIndex === null ? 0 : selectedIndex;
+    const index = selectedIndex === undefined ? 0 : selectedIndex;
     const reordered = state.cells.slice(index).concat(state.cells.slice(0, index));
     const prevIndex = reordered.slice().reverse().findIndex(cell => cell.value === 0);
     if (prevIndex !== -1) {
@@ -105,7 +105,7 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
         undo();
       } else if (event.key === 'y' && event.ctrlKey) {
         redo();
-      } else if (selectedIndex !== null) {
+      } else if (selectedIndex !== undefined) {
         let { row, col } = indexToRowAndCol(selectedIndex);
         if (event.key === 'ArrowLeft') {
           col = (col + 8) % 9;
@@ -133,14 +133,14 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
     onCellClick: (cell: Cell) => setSelectedIndex(cell.index)
   };
 
-  const currentSelection = selectedIndex !== null ? state.cells[selectedIndex].candidates : Array(9).fill(false);
+  const currentSelection = selectedIndex !== undefined ? state.cells[selectedIndex].candidates : Array(9).fill(false);
 
   const controlsProps: ControlsProps = {
-    isNoteMode: isNoteMode,
-    canErase: true,
+    candidateMode: isNoteMode,
+    canErase: selectedIndex !== undefined && !state.cells[selectedIndex].isClue,
     canUndo: canUndo,
     canRedo: canRedo,
-    currentSelection: currentSelection,
+    selectedNumbers: currentSelection,
     onSelectNumber: handleNumberInput,
     onErase: eraseCell,
     onNoteToggle: handleNoteModeToggle,
@@ -149,13 +149,13 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
   };
 
   return (
-    <div className='sudoku'>
-      <div className='board-container'>
+    <div className='sudoku-player'>
+      <div className='sudoku-stretch'>
         <BoardView {...boardProps} />
       </div>
-      <div className='controls-container'>
+      {/* <div className='controls-container'> */}
         <Controls {...controlsProps} />
-      </div>
+      {/* </div> */}
     </div>
   )
 }

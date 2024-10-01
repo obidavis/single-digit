@@ -6,10 +6,10 @@ interface CandidateViewProps {
 
 function CandidateView(props: CandidateViewProps) {
   return (
-    <div className='candidates-view three-by-three'>
+    <div className='candidates three-by-three'>
       {props.candidates.map((candidate, index) => {
         return (
-          <div key={index} className='candidate'>
+          <div key={index} className='number'>
             {candidate ? index + 1 : ''}
           </div>
         );
@@ -20,9 +20,9 @@ function CandidateView(props: CandidateViewProps) {
 
 export interface CellViewProps {
   cell: Cell;
-  isSelected: boolean;
-  isHighlightedByValue: boolean;
-  isHighlightedByPosition: boolean;
+  isSelected?: boolean;
+  isHighlightedByValue?: boolean;
+  isHighlightedByPosition?: boolean;
   onClick: (cell: Cell) => void;
 }
 
