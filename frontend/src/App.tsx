@@ -79,7 +79,7 @@ function renderUI({ isSideNavExpanded, onClickSideNavExpand }: HeaderContainerRe
 }
 
 export const App = () => (
-  <ClassPrefix prefix="single-digit">
+  <>
     <HeaderContainer render={renderUI} />
     <Routes>
       <Route path="/" element={<SudokuPage />} />
@@ -89,5 +89,5 @@ export const App = () => (
       <Route path="/library" element={<p>Library</p>} />
       <Route path="/generator" element={<SudokuGeneratorPage />} />
     </Routes>
-  </ClassPrefix>
+  </>
 )

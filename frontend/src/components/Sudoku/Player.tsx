@@ -29,6 +29,9 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
   const [autoCandidates, setAutoCandidates] = useState(false);
 
   const applyAutoCandidates = useCallback(() => {
+    if (!autoCandidates) {
+      return;
+    }
     const newBoard = produce(state, draft => {
       draft.cells.forEach((cell, index) => {
         if (cell.value !== 0) {
@@ -50,7 +53,7 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
     });
     set(newBoard);
     savePuzzle(newBoard);
-  }, [state, set]);
+  }, [state, set, autoCandidates, savePuzzle]);
 
   const setCellValue = useCallback((value: number) => {
     if (selectedIndex !== undefined) {
@@ -63,6 +66,7 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
       });
       set(newBoard);
       savePuzzle(newBoard);
+      applyAutoCandidates();
     }
   }, [selectedIndex, state, set, savePuzzle]);
 

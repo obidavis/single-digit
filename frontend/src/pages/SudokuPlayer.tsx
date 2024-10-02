@@ -6,6 +6,8 @@ import { Error } from "../components/Error";
 import { useSavedPuzzles } from "../hooks/useSavedPuzzles";
 import { useCallback, useEffect, useState } from "react";
 
+let renderCount = 0;
+
 export const SudokuPlayerPage = () => {
   const location = useLocation();
   const navigate = useNavigate();

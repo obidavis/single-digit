@@ -1,16 +1,4 @@
 
-// @media all and (orientation: landscape) {
-//   .sudoku-player {
-//     grid-template-rows: 60vh auto;
-//   }
-// }
-
-// @media all and (orientation: portrait) {
-//   .sudoku-player {
-//     grid-template-rows: 100vw auto;
-//   }
-// } 
-
 :root {
   /* colours */
   --position-select-colour:   rgb(236, 251, 232);
@@ -26,18 +14,7 @@
   --button-bg: #dcdcdc;
   --button-selected: #8f8f8f;
   --button-text: var(--button-selected);
-  --green-button: #029802;
 }
-
-// .sudoku-player {
-//   --board-dim: 100vw;
-// }
-
-// @media (min-aspect-ratio: 0.62) {
-//   .sudoku-player {
-//     --board-dim: 62vh;
-//   }
-// }
 
 .sudoku-game-root {
   width: 95vw;
@@ -67,6 +44,9 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
+    @media (orientation: landscape) {
+      width: 62vh;
+    }
   }
 }
 
@@ -75,11 +55,14 @@
   aspect-ratio: 1;
   max-width: 62vh;
   @media (orientation: landscape) {
-      height: 62vh;
+      // height: 62vh;
   }
 
   gap: 1px;
-  outline: 2px solid black;
+  outline: 1px solid black;
+  @container(min-width: 60px) {
+    outline: 2px solid black;
+  }
   @container(min-width: 120px) {
     gap: 2px;
     outline: 3px solid black;
