@@ -4,7 +4,7 @@ import { Cell, Board } from '../../models/Sudoku';
 import { Controls, ControlsProps } from './Controls';
 import { produce } from 'immer';
 import { useHistoryState } from '@uidotdev/usehooks';
-import { indexToBoxIndex, indexToRowAndCol, indexToRowIndex, rowAndColToIndex, indexToColIndex } from '../../utils/sudokuUtils';
+import { indexToBoxIndex, indexToRowAndCol, indexToRowIndex, rowAndColToIndex, indexToColIndex, removeSolvedCellsFromCandidates } from '../../utils/sudokuUtils';
 import { useSavedPuzzles } from '../../hooks/useSavedPuzzles';
 
 
@@ -52,7 +52,6 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
       });
     });
     set(newBoard);
-    savePuzzle(newBoard);
   }, [state, set, autoCandidates, savePuzzle]);
 
   const setCellValue = useCallback((value: number) => {
@@ -63,12 +62,14 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
       const newBoard = produce(state, draft => {
         draft.cells[selectedIndex].value = value;
         draft.cells[selectedIndex].candidates = Array(9).fill(false);
+        if (autoCandidates) {
+          removeSolvedCellsFromCandidates(draft);
+        }
       });
       set(newBoard);
       savePuzzle(newBoard);
-      applyAutoCandidates();
     }
-  }, [selectedIndex, state, set, savePuzzle]);
+  }, [selectedIndex, state, set, savePuzzle, autoCandidates]);
 
   const toggleCandidate = useCallback((candidate: number) => {
     if (selectedIndex !== undefined) {

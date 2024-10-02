@@ -227,6 +227,7 @@ export const Controls = (props: ControlsProps) => (
       labelText='Auto Candidates' hideLabel
       size='sm'
       onClick={props.onToggleAutoCandidates}
+      toggled={props.autoCandidates}
       />
   </div>
 )

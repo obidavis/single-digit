@@ -118,3 +118,17 @@ export const longToShortString = (longString: string): string => {
   }
   return boardToShortString(board);
 }
+
+const isSameConstrainSet = (index1: number, index2: number) => {
+  return indexToRowIndex(index1) === indexToRowIndex(index2) ||
+          indexToColIndex(index1) === indexToColIndex(index2) ||
+          indexToBoxIndex(index1) === indexToBoxIndex(index2);
+}
+
+export const removeSolvedCellsFromCandidates = (board: Board): void => {
+  board.cells.filter(cell => cell.value !== 0).forEach((cell1, index1) => {
+    board.cells.filter((cell2, index2) => isSameConstrainSet(index1, index2)).forEach(cell2 => {
+      cell2.candidates[cell1.value - 1] = false;
+    });
+  });
+}
