@@ -35,8 +35,7 @@
   @media (orientation: landscape) {
     height: 62vh;
     flex-direction: row;
-    align-items: stretch;
-    justify-content: center;
+    justify-content: space-evenly;
   }
 
   .sudoku-stretch {
@@ -84,7 +83,7 @@
   gap: 0.5rem;
   @media (orientation: landscape) {
     justify-content: start;
-    max-width: 240px;
+    max-width: 20rem;
   }
 
   div {
@@ -140,7 +139,7 @@
           gap: 0;
           
           > span {
-            color: black;
+            // color: black;
           }
 
           &.selected {
@@ -231,6 +230,7 @@
   text-align: center;
   position: relative;
   container-type: size;
+  user-select: none;
 }
 
 .cell .number {

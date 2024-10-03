@@ -5,7 +5,7 @@ import { Controls, ControlsProps } from './Controls';
 import { produce } from 'immer';
 import { useHistoryState } from '@uidotdev/usehooks';
 import { indexToBoxIndex, indexToRowAndCol, indexToRowIndex, rowAndColToIndex, indexToColIndex, removeSolvedCellsFromCandidates } from '../../utils/sudokuUtils';
-import { useSavedPuzzles } from '../../hooks/useSavedPuzzles';
+import { useSavedPuzzlesStore } from '../../hooks/useSavedPuzzles';
 
 
 export interface SudokuParams {
@@ -23,7 +23,7 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
     clear();
     set(initialState);
   }, [initialState, set, clear]);
-  const { savePuzzle } = useSavedPuzzles();
+  const { savePuzzle } = useSavedPuzzlesStore();
   const [selectedIndex, setSelectedIndex] = useState<number | undefined>(undefined);
   const [isNoteMode, setIsNoteMode] = useState(false);
   const [autoCandidates, setAutoCandidates] = useState(false);

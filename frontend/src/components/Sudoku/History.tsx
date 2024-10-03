@@ -12,21 +12,31 @@ import {
 } from '@carbon/react';
 import { Play, TrashCan } from '@carbon/icons-react';
 import { Board } from '../../models/Sudoku';
-import { boardFromString } from '../../utils/sudokuUtils';
+import { boardFromString, boardToShortString, boardToLongString } from '../../utils/sudokuUtils';
 import { Link } from 'react-router-dom';
 import { SavedPuzzles } from '../../hooks/useSavedPuzzles';
 import { SudokuCard } from '../SudokuCard';
 import { BoardView } from './BoardView';
 
 interface ActionButtonsProps {
-  board: string;
+  boardString: string;
   onRemove: () => void;
 };
 
-const ActionButtons = ({ board, onRemove }: ActionButtonsProps) => {
+const ActionButtons = ({ boardString: board, onRemove }: ActionButtonsProps) => {
   return (
     <>
-      <Button as={Link} to={`/play?board=${board}`} renderIcon={Play} hasIconOnly kind="ghost" iconDescription='Play' />
+      <Button 
+        as={Link} 
+        to={{
+          pathname: '/play',
+          search: `?board=${board}`
+        }} 
+        state={{ resume: true }}
+        renderIcon={Play} hasIconOnly 
+        kind="ghost" 
+        iconDescription='Play' 
+        />
       <Button onClick={onRemove} renderIcon={TrashCan} hasIconOnly kind="danger" iconDescription='Delete'/>
     </>
   )
@@ -46,18 +56,15 @@ export const History = ({ savedPuzzles, onRemove }: SudokuHistoryProps) => {
   };
 
   const rows = Object.entries(savedPuzzles)
-    .map(([key, value]) => {
-      return { id: key, board: boardFromString(value.state) };
-    })
-    .filter(({ board }) => board !== null)
-    .map(({ id, board }) => {
-      const progress = calculateProgress(board!);
+    .map(([id, { board }]) => {
+      const progress = calculateProgress(board);
+      const boardString = boardToShortString(board);
       return {
         id: id,
         board: <BoardView board={board!} />,
         lastPlayed: new Date(savedPuzzles[id].lastPlayed).toLocaleString(),
         progress: <ProgressBar label={`${progress}%`} value={progress} />,
-        actions: <ActionButtons board={savedPuzzles[id].state} onRemove={() => onRemove(id)} />
+        actions: <ActionButtons boardString={boardString} onRemove={() => onRemove(id)} />
       };
     });
 

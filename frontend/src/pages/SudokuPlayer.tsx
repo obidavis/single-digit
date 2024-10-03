@@ -1,70 +1,49 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { SudokuPlayer } from "../components/Sudoku/Player";
 import { Content, Modal } from "@carbon/react";
-import { boardFromString, boardToShortString, validateBoardString } from "../utils/sudokuUtils";
+import { boardFromString, boardToShortString, validateBoardString, boardToLongString } from "../utils/sudokuUtils";
 import { Error } from "../components/Error";
-import { useSavedPuzzles } from "../hooks/useSavedPuzzles";
-import { useCallback, useEffect, useState } from "react";
+import { useSavedPuzzlesStore } from "../hooks/useSavedPuzzles";
+import { useCallback, useEffect, useState, useMemo } from "react";
+import defaultPuzzles from "../data/defaultPuzzles.json";
+import { PuzzleSet } from "../models/SudokuAPI";
 
-let renderCount = 0;
+const { puzzles } = defaultPuzzles as PuzzleSet;
 
 export const SudokuPlayerPage = () => {
-  const location = useLocation();
   const navigate = useNavigate();
-  const { savedPuzzles, removePuzzle } = useSavedPuzzles();
-
-  const [boardParam, setBoardParam] = useState<string | null>(null);
-  useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const board = searchParams.get('board');
-    if (board !== null && validateBoardString(board)) {
-      setBoardParam(board);
-    } else {
-      setBoardParam(null);
-    }
-  }, [boardParam, location.search]);
-
+  const [searchParams] = useSearchParams();
+  const boardParam = useMemo(() => searchParams.has('board') ? searchParams.get('board')! : puzzles[0].clues, []);
+  const savedPuzzle = useSavedPuzzlesStore.getState().savedPuzzles[boardParam];
+  const removePuzzle = useSavedPuzzlesStore(useCallback((state) => state.removePuzzle, []));
+  const hasSavedProgress = savedPuzzle !== undefined;
   
-  const progress = boardParam && savedPuzzles[boardParam];
-  
+  const location = useLocation();
+  const resume = location.state?.resume;
+
+  const board = resume && hasSavedProgress ? savedPuzzle.board : boardFromString(boardParam);
+  console.log('resume', resume, 'hasSavedProgress', hasSavedProgress, 'board', board);
+
   const handleStartOver = useCallback(() => {
-    if (boardParam === null) {
-      return;
-    }
-    const board = boardFromString(boardParam);
+    const board = boardFromString(boardParam)
     if (board !== null) {
       const shortString = boardToShortString(board);
       removePuzzle(shortString);
-      navigate(`?board=${shortString}`, { replace: true });
-      setBoardParam(shortString);
     }
-  }, [boardParam, navigate, removePuzzle]);
+  }, [boardParam, removePuzzle]);
 
   const handleContinue = useCallback(() => {
     if (boardParam === null) {
       return;
     }
-    const boardString = savedPuzzles[boardParam].state;
-    navigate(`?board=${boardString}`, { replace: true });
-    setBoardParam(boardString);
-  }, [boardParam, navigate, savedPuzzles]);
+    navigate(`?board=${boardParam}`, { replace: true, state: { resume: true } });
+  }, [boardParam, navigate]);
 
-  if (boardParam === null) {
-    return <Error message="No board found" />
-  }
-
-  const board = boardFromString(boardParam);
-  if (board === null) {
-    return <Error message="Invalid board" />
-  }
-  
   return (
     <Content style={{maxWidth: 'none', justifyContent: 'center', padding: "1rem"}}>
-      {/* <div className="sudoku-game-root"> */}
-        <SudokuPlayer initialState={board} />
-      {/* </div> */}
+      <SudokuPlayer initialState={board!} />
       <Modal 
-        open={!!progress}
+        open={resume === undefined && hasSavedProgress}
         modalHeading="Continue?"
         primaryButtonText="Continue"
         secondaryButtonText="Start Over"

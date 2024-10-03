@@ -222,12 +222,12 @@ export const Controls = (props: ControlsProps) => (
       <Switch name="candidateInput" text='Candidate' style={{ justifyContent: 'center' }} />
     </ContentSwitcher>
     <NumPad {...props} />
-    <Toggle 
+    {/* <Toggle 
       id="auto-candidates" 
       labelText='Auto Candidates' hideLabel
       size='sm'
       onClick={props.onToggleAutoCandidates}
       toggled={props.autoCandidates}
-      />
+      /> */}
   </div>
 )

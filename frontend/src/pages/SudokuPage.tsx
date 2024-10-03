@@ -1,11 +1,11 @@
 import { Content, Button, ButtonSet, ButtonSkeleton, Stack, Tile, Grid, Column } from "@carbon/react";
 import { useDailyPuzzles } from "../hooks/useDailyPuzzles";
-import { useSavedPuzzles } from "../hooks/useSavedPuzzles";
+import { useSavedPuzzlesStore } from "../hooks/useSavedPuzzles";
 import { History } from "../components/Sudoku/History";
 import { SudokuCard } from "../components/SudokuCard";
 
 const RecentTile = () => {
-  const { savedPuzzles, removePuzzle } = useSavedPuzzles();
+  const { savedPuzzles, removePuzzle } = useSavedPuzzlesStore();
   // Only show the most recent 5 puzzles
   const recentPuzzles = Object.entries(savedPuzzles).sort((a, b) => {
     return b[1].lastPlayed - a[1].lastPlayed;
