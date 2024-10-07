@@ -1,11 +1,11 @@
 import { Content, Button, ButtonSet, ButtonSkeleton, Stack, Tile, Grid, Column } from "@carbon/react";
 import { useDailyPuzzles } from "../hooks/useDailyPuzzles";
 import { useSavedPuzzlesStore } from "../hooks/useSavedPuzzles";
-import { History } from "../components/Sudoku/History";
+import { History } from "../components/History";
 import { SudokuCard } from "../components/SudokuCard";
 
 const RecentTile = () => {
-  const { savedPuzzles, removePuzzle } = useSavedPuzzlesStore();
+  const { savedGames: savedPuzzles, removePuzzle } = useSavedPuzzlesStore();
   // Only show the most recent 5 puzzles
   const recentPuzzles = Object.entries(savedPuzzles).sort((a, b) => {
     return b[1].lastPlayed - a[1].lastPlayed;
@@ -41,15 +41,15 @@ const DailyPuzzlesTile = () => {
     <Tile>
       <Stack gap={4}>
         <h4>Daily Puzzles</h4>
-        <Grid>
-          <Column sm={4}>
-            <SudokuCard clues={dailyPuzzles.easy.clues} />
+        <Grid fullWidth>
+          <Column sm={1} md={2} lg={4}>
+            <SudokuCard puzzle={dailyPuzzles.easy} />
           </Column>
-          <Column sm={4}>
-            <SudokuCard clues={dailyPuzzles.moderate.clues} />
+          <Column sm={1} md={2} lg={4}>
+            <SudokuCard puzzle={dailyPuzzles.moderate} />
           </Column>
-          <Column sm={4}>
-            <SudokuCard clues={dailyPuzzles.tough.clues} />
+          <Column sm={1} md={2} lg={4}>
+            <SudokuCard puzzle={dailyPuzzles.tough} />
           </Column>
         </Grid>
         {/* <ButtonSet>

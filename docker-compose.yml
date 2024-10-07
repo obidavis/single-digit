@@ -16,8 +16,6 @@ services:
   frontend-dev:
     image: node:14
     container_name: singledigit-frontend-dev
-    build:
-      context: ./frontend
     ports:
       - 3000:3000
     volumes:
@@ -41,3 +39,27 @@ services:
     profiles:
       - prod
 
+  mongodb:
+    image: mongo:7.0.12
+    container_name: singledigit-mongodb
+    volumes:
+      - mongodb-data:/data/db
+    env_file:
+      - ./mongodb/.env
+    profiles:
+      - dev
+      - prod
+
+  mongo-express:
+    image: mongo-express:1.0.2
+    ports:
+      - 8081:8081
+    container_name: singledigit-mongo-express
+    env_file:
+      - ./mongo-express/.env
+    profiles:
+      - dev
+
+
+volumes:
+  mongodb-data:

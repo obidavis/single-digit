@@ -1,7 +1,7 @@
-import { Cell, Board } from '../../models/Sudoku';
+import { SudokuCell, SudokuGameState } from '../../models/Sudoku';
 import { CellView, CellViewProps } from './CellView';
 import { indexToBoxIndex, indexToColIndex, indexToRowIndex } from '../../utils/sudokuUtils';
-import "./Sudoku.scss";
+import "../../styles/Player.scss";
 
 const boxIndices = Array.from(Array(81).keys()).map((i) => {
   return (
@@ -12,9 +12,9 @@ const boxIndices = Array.from(Array(81).keys()).map((i) => {
 });
 
 export interface BoardViewProps {
-  board: Board;
+  board: SudokuGameState;
   selectedIndex?: number;
-  onCellClick?: (cell: Cell) => void;
+  onCellClick?: (cell: SudokuCell) => void;
 }
 
 export const BoardView = ({ board, selectedIndex, onCellClick: onClick = () => {}}: BoardViewProps) => {

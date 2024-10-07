@@ -1,47 +1,38 @@
-import { Board } from "../models/Sudoku";
+import { SudokuGameState } from "../models/Sudoku";
 import { useCallback, useEffect, useState } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { boardToShortString } from "../utils/sudokuUtils";
+import { stat } from "fs";
 // import { boardToLongString } from "../utils/sudokuUtils";
 
-export interface SavedPuzzle {
-  lastPlayed: number;
-  board: Board;
-};
+export type SavedPuzzles = Record<string, SudokuGameState>;
 
-export type SavedPuzzles = Record<string, SavedPuzzle>;
-
-interface SavedPuzzleState {
-  savedPuzzles: SavedPuzzles;
-  savePuzzle: (state: Board) => void;
+interface SavedGamesStore {
+  savedGames: SavedPuzzles;
+  savePuzzle: (state: SudokuGameState) => void;
   removePuzzle: (key: string) => void;
   // clearSavedPuzzles: () => void;
 };
 
-export const useSavedPuzzlesStore = create<SavedPuzzleState>()(
+export const useSavedPuzzlesStore = create<SavedGamesStore>()(
   persist(
-    (set, get) => ({
-      savedPuzzles: {},
-
-      savePuzzle: (board: Board) => set((state) => {
-        const key = boardToShortString(board);
-        return {
-          savedPuzzles: {
-            ...state.savedPuzzles,
-            [key]: {
-              lastPlayed: new Date().getTime(),
-              board,
-            },
-          },
-        };
-      }),
+    (set) => ({
+      savedGames: {},
+      
+      savePuzzle: (newState: SudokuGameState) => set((state) => ({
+        savedGames: {
+          ...state.savedGames,
+          [newState.puzzle.clues]: newState,
+        }
+      })),
 
       removePuzzle: (key: string) => set((state) => {
-        const savedPuzzles = { ...state.savedPuzzles };
-        delete savedPuzzles[key];
-        return { savedPuzzles };
+        const savedGames = { ...state.savedGames };
+        delete savedGames[key];
+        return { savedGames };
       }),
+      
 
     }),
     {

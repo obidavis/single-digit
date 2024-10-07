@@ -1,24 +1,24 @@
 import { useCallback, useEffect, useState } from 'react'
-import { BoardView, BoardViewProps } from './BoardView'
-import { Cell, Board } from '../../models/Sudoku';
-import { Controls, ControlsProps } from './Controls';
+import { BoardView, BoardViewProps } from './Player/BoardView'
+import { SudokuCell, SudokuGameState } from '../models/Sudoku';
+import { Controls, ControlsProps } from './Player/Controls';
 import { produce } from 'immer';
 import { useHistoryState } from '@uidotdev/usehooks';
-import { indexToBoxIndex, indexToRowAndCol, indexToRowIndex, rowAndColToIndex, indexToColIndex, removeSolvedCellsFromCandidates } from '../../utils/sudokuUtils';
-import { useSavedPuzzlesStore } from '../../hooks/useSavedPuzzles';
+import { indexToBoxIndex, indexToRowAndCol, indexToRowIndex, rowAndColToIndex, indexToColIndex, removeSolvedCellsFromCandidates } from '../utils/sudokuUtils';
+import { useSavedPuzzlesStore } from '../hooks/useSavedPuzzles';
+import "../styles/Player.scss";
 
 
 export interface SudokuParams {
-  initialState: Board;
+  initialState: SudokuGameState;
 }
 
 interface InProgressPuzzle {
-  state: Board;
-
+  state: SudokuGameState;
 }
 
 export const SudokuPlayer = ({ initialState }: SudokuParams) => {
-  const { state, undo, redo, canRedo, canUndo, set, clear } = useHistoryState<Board>(initialState);
+  const { state, undo, redo, canRedo, canUndo, set, clear } = useHistoryState<SudokuGameState>(initialState);
   useEffect(() => {
     clear();
     set(initialState);
@@ -65,6 +65,7 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
         if (autoCandidates) {
           removeSolvedCellsFromCandidates(draft);
         }
+        draft.lastPlayed = new Date().getTime();
       });
       set(newBoard);
       savePuzzle(newBoard);
@@ -79,6 +80,7 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
       const newBoard = produce(state, draft => {
         draft.cells[selectedIndex].value = 0;
         draft.cells[selectedIndex].candidates[candidate - 1] = !draft.cells[selectedIndex].candidates[candidate - 1];
+        draft.lastPlayed = new Date().getTime();
       });
       set(newBoard);
       savePuzzle(newBoard);
@@ -173,7 +175,7 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
   const boardProps: BoardViewProps = {
     board: state,
     selectedIndex: selectedIndex,
-    onCellClick: (cell: Cell) => setSelectedIndex(cell.index)
+    onCellClick: (cell: SudokuCell) => setSelectedIndex(cell.index)
   };
 
   const currentSelection = selectedIndex !== undefined ? state.cells[selectedIndex].candidates : Array(9).fill(false);

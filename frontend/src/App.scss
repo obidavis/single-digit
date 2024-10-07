@@ -37,6 +37,11 @@ $colours: (
 
     support-success: map-get($colours, bright-green0),
     support-success-inverse: map-get($colours, bright-green1),
+
+    ai-inner-shadow: map-get($colours, pale-green0),
+    ai-drop-shadow: map-get($colours, pale-green1),
+    ai-border-start: map-get($colours, green0),
+    ai-border-end: map-get($colours, green0),
   )
 );
 

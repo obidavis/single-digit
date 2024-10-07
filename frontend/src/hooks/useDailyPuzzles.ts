@@ -1,16 +1,6 @@
 import { useEffect, useState } from 'react';
+import { DailyPuzzles } from '../models/SudokuAPI';
 
-declare type Puzzle = {
-  clues: string
-  solution: string
-};
-
-declare type DailyPuzzles = {
-  date: string;
-  easy: Puzzle;
-  moderate: Puzzle;
-  tough: Puzzle;
-};
 
 const getStoredDailyPuzzles = (date: string): DailyPuzzles | null => {
   const storedPuzzles = localStorage.getItem('dailyPuzzles');

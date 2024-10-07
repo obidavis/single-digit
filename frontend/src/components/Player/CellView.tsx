@@ -1,4 +1,4 @@
-import { Cell, } from '../../models/Sudoku';
+import { SudokuCell, } from '../../models/Sudoku';
 
 interface CandidateViewProps {
   candidates: boolean[];
@@ -19,11 +19,11 @@ function CandidateView(props: CandidateViewProps) {
 }
 
 export interface CellViewProps {
-  cell: Cell;
+  cell: SudokuCell;
   isSelected?: boolean;
   isHighlightedByValue?: boolean;
   isHighlightedByPosition?: boolean;
-  onClick: (cell: Cell) => void;
+  onClick: (cell: SudokuCell) => void;
 }
 
 export const CellView = ({ cell, isSelected, isHighlightedByPosition, isHighlightedByValue, onClick }: CellViewProps) => (

@@ -18,34 +18,16 @@ import {
 } from "@carbon/react";
 import {
   BoardView
-} from "../components/Sudoku/BoardView";
-import "../components/Sudoku/Sudoku.scss";
-import { Board } from "../models/Sudoku";
+} from "../components/Player/BoardView";
+// import "../components/Player/Sudoku.scss";
+import { SudokuGameState } from "../models/Sudoku";
 import { useState } from "react";
+import { Puzzle } from "../models/SudokuAPI";
+import { SudokuCard } from "../components/SudokuCard";
 
 interface GeneratorResults {
-  puzzles: {
-    clues: string;
-    solution: string;
-    difficulty: number;
-  }[];
-}
-
-export const MiniBoard = ({ clues }: { clues: string }) => {
-  const cells = clues.split('').map((c, i) => ({
-    index: i,
-    value: c === '0' ? 0 : parseInt(c),
-    candidates: [],
-    isClue: c !== '0',
-  }));
-  const board: Board = { cells };
-  return (
-    <Grid>
-      <Column sm={3}>
-        <BoardView board={board} />
-      </Column>
-    </Grid>
-    )
+  puzzles: Puzzle[];
+  
 }
 
 export const SudokuGeneratorPage = () => {
@@ -99,7 +81,7 @@ export const SudokuGeneratorPage = () => {
         {error && <p>Error: {error}</p>}
         {results && (
           results.puzzles.map((puzzle, i) => (
-            <MiniBoard key={i} clues={puzzle.clues} />
+            <SudokuCard key={i} puzzle={puzzle} />
           ))
         )}
       </Stack>
