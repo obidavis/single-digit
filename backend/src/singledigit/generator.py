@@ -1,6 +1,8 @@
 import subprocess
 import json
 import logging
+from dataclasses import dataclass
+from enum import StrEnum
 
 # Configure a logger for this module
 logger = logging.getLogger(__name__)
@@ -18,20 +20,31 @@ console_handler.setFormatter(formatter)
 # Add the handler to the logger
 logger.addHandler(console_handler)
 
-def generate_sudoku(*, seed: int = 0, count: int = 1, difficulty: str = 'easy') -> dict:
-    logger.info(f"Generating {count} puzzles of difficulty {difficulty} with seed {seed}")
-    result = subprocess.run([
+@dataclass
+class GenerateOptions:
+    seed: int | None = None
+    count: int = 1
+    difficulty: str = 'any'
+
+
+def generate_sudoku(opts: GenerateOptions) -> dict:
+    logger.info(f"Generating {opts.count} puzzles of difficulty {opts.difficulty} with seed {opts.seed}")
+    command = [
         "singledigit", "generate", 
-        "--seed", str(seed),
-        "--count", str(count),
-        "--difficulty", difficulty,
-        "--format", "json"
-        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        "--format", "json",
+        "--indent", "-1",
+        "--count", str(opts.count)
+    ]
+    
+    if opts.seed is not None:
+        command.extend(["--seed", str(opts.seed)])
+    if opts.difficulty != 'any':
+        command.extend(["--difficulty", opts.difficulty])
+
+    result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if result.returncode != 0:
-        logger.error(f"Failed to generate puzzles with seed {seed}")
         return {}
     
     puzzles = json.loads(result.stdout)
-    logger.info(f"Generated {len(puzzles)} puzzles with seed {seed}")
     logger.info(f"Generated puzzles: {puzzles}")
     return puzzles

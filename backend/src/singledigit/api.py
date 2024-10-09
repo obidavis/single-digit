@@ -2,7 +2,7 @@ import os
 import json
 from flask import Blueprint, request, jsonify
 from datetime import datetime
-from .generator import generate_sudoku, logger
+from .generator import generate_sudoku, GenerateOptions
 
 api_bp = Blueprint('api', __name__)
 
@@ -36,12 +36,14 @@ def daily_puzzle():
     easy = generate_sudoku(seed=seed, count=1, difficulty='easy')
     moderate = generate_sudoku(seed=seed, count=1, difficulty='moderate')
     tough = generate_sudoku(seed=seed, count=1, difficulty='tough')
+    hard = generate_sudoku(seed=seed, count=1, difficulty='hard')
 
     puzzles = {
         "date": date,
         "easy": easy["puzzles"][0],
         "moderate": moderate["puzzles"][0],
-        "tough": tough["puzzles"][0]
+        "tough": tough["puzzles"][0],
+        "hard": hard["puzzles"][0]
     }
 
     # Step 3: Cache the newly generated puzzles
@@ -51,10 +53,16 @@ def daily_puzzle():
 
 @api_bp.route('/generate', methods=['POST'])
 def generate():
-    data = request.form
-    seed = data.get('seed', 0)
+    data = request.json
+    seed = data.get('seed', None)
     count = data.get('count', 1)
-    difficulty = data.get('difficulty', 'easy')
-
-    puzzles = generate_sudoku(seed=seed, count=count, difficulty=difficulty)
+    if count < 1:
+        return jsonify({"error": "Count must be at least 1"}), 400
+    if count > 100:
+        return jsonify({"error": "Count must be at most 100"}), 400
+    difficulty = data.get('difficulty', 'any')
+    if difficulty not in ['easy', 'moderate', 'tough', 'hard', 'any']:
+        return jsonify({"error": "Invalid difficulty"}), 400
+    options = GenerateOptions(seed=seed, count=count, difficulty=difficulty)
+    puzzles = generate_sudoku(options)
     return puzzles
