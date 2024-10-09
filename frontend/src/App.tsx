@@ -1,7 +1,9 @@
 import './styles/App.scss';
 import {
   ClassPrefix,
+  Column,
   Content,
+  Grid,
   Header,
   HeaderContainer,
   HeaderMenuButton,
@@ -10,14 +12,13 @@ import {
   HeaderNavigation,
   HeaderSideNavItems,
   IconButton,
+  Row,
   SideNav,
   SideNavItems,
+  SideNavLink,
+  SideNavLinkText,
+  SideNavMenuItem,
 } from '@carbon/react';
-
-import {
-  ArrowLeft,
-  ChevronLeft
-} from '@carbon/icons-react';
 
 
 import { SudokuPage } from './pages/SudokuPage';
@@ -27,6 +28,7 @@ import { SudokuGeneratorPage } from './pages/SudokuGenerator';
 import { Library } from './pages/Library';
 import { Link, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import { HeaderContainerRenderProps } from '@carbon/react/lib/components/UIShell/HeaderContainer';
+import { Home, Query, RecentlyViewed, ToolKit, Information, Chemistry } from '@carbon/react/icons';
 
 function renderMainUI({ isSideNavExpanded, onClickSideNavExpand }: HeaderContainerRenderProps) {
   return (
@@ -34,55 +36,39 @@ function renderMainUI({ isSideNavExpanded, onClickSideNavExpand }: HeaderContain
       <Header aria-label='header'>
         <HeaderMenuButton aria-label='Expand menu' onClick={onClickSideNavExpand} isActive={isSideNavExpanded} aria-expanded={isSideNavExpanded}/>
         <HeaderName prefix='SingleDigit' href='/'>
-          Sudoku
         </HeaderName>
-        <HeaderNavigation aria-label='menu'>
-          <HeaderMenuItem as={Link} to={"/"}>
-            Home
-          </HeaderMenuItem>
-          <HeaderMenuItem as={Link} to={"/about"} >
-            About
-          </HeaderMenuItem>
-          <HeaderMenuItem as={Link} to={"/history"}>
-            History
-          </HeaderMenuItem>
-          <HeaderMenuItem as={Link} to={"/library"}>
-            Library
-          </HeaderMenuItem>
-          <HeaderMenuItem as={Link} to={"/generator"}>
-            Generator
-          </HeaderMenuItem>
-        </HeaderNavigation>
       <SideNav 
         aria-label='Side navigation'
         expanded={isSideNavExpanded} 
         onOverlayClick={onClickSideNavExpand} 
         onSideNavBlur={onClickSideNavExpand}
-        isPersistent={false}
         >
-        {isSideNavExpanded && <SideNavItems>
-          <HeaderSideNavItems>
-            <HeaderMenuItem as={Link} to={"/"} onClick={onClickSideNavExpand}>
-              Home
-            </HeaderMenuItem>
-            <HeaderMenuItem as={Link} to={"/about"} onClick={onClickSideNavExpand}>
+        <SideNavItems>
+          <SideNavItems>
+            <SideNavLink as={Link} to={"/"} onClick={onClickSideNavExpand} renderIcon={Home}>
+              <SideNavLinkText>Home</SideNavLinkText>
+            </SideNavLink>
+            <SideNavLink as={Link} to={"/about"} onClick={onClickSideNavExpand} renderIcon={Information}>
               About
-            </HeaderMenuItem>
-            <HeaderMenuItem as={Link} to={"/history"} onClick={onClickSideNavExpand}>
+            </SideNavLink>
+            <SideNavLink as={Link} to={"/history"} onClick={onClickSideNavExpand} renderIcon={RecentlyViewed}>
               History
-            </HeaderMenuItem>
-            <HeaderMenuItem as={Link} to={"/library"} onClick={onClickSideNavExpand}>
-              Library
-            </HeaderMenuItem>
-            <HeaderMenuItem as={Link} to={"/generator"} onClick={onClickSideNavExpand}>
+            </SideNavLink>
+            <SideNavLink as={Link} to={"/generator"} onClick={onClickSideNavExpand} renderIcon={Chemistry}>
               Generator
-            </HeaderMenuItem>
-          </HeaderSideNavItems>
-        </SideNavItems>}
+            </SideNavLink>
+          </SideNavItems>
+        </SideNavItems>
       </SideNav>
       </Header>
       <Content>
-        <Outlet />
+        <Grid>
+          {/* <Row> */}
+            <Column lg={{ span: 12, offset: 4 }} md={8} sm={4}>
+              <Outlet />
+            </Column>
+          {/* </Row> */}
+        </Grid>
       </Content>
     </>
   );
@@ -94,7 +80,6 @@ export const App = () => (
       <Route path="/" element={<SudokuPage />} />
       <Route path="/about" element={<p>About</p>} />
       <Route path="/history" element={<SudokuHistoryPage />} />
-      <Route path="/library" element={<Library />} />
       <Route path="/generator" element={<SudokuGeneratorPage />} />
     </Route>
     {/* <Route element={<HeaderContainer render={renderPlayerUI} />} > */}
