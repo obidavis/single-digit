@@ -16,14 +16,6 @@
   --button-text: var(--button-selected);
 }
 
-.sudoku-game-root {
-  width: 95vw;
-  height: calc(95vh - 4rem);
-  flex: 1 0 auto;
-  display: flex;
-  flex-direction: column;
-}
-
 .sudoku-player {
   height: 100vh;
   display: flex;
@@ -78,7 +70,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: end;
+  justify-content: flex-end;
   container-type: size;
   gap: 0.5rem;
   @media (orientation: landscape) {
