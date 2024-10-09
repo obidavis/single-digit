@@ -21,6 +21,10 @@ $colours: (
   grey1:         #dcdcdc,
 );
 
+@use '@carbon/react/scss/config' with (
+  $use-flexbox-grid: true,
+);
+
 @use '@carbon/react/scss/themes';
 
 @use '@carbon/react/scss/theme' with (
@@ -49,6 +53,7 @@ $colours: (
   $button-primary: map-get($colours, bright-green0),
   $button-primary-hover: map-get($colours, bright-green1),
 );
+
 
 @use '@carbon/react';
 
