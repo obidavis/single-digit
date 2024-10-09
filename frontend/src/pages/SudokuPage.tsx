@@ -1,8 +1,10 @@
-import { Content, Button, ButtonSet, ButtonSkeleton, Stack, Tile, Grid, Column } from "@carbon/react";
+import { Content, Button, ButtonSet, ButtonSkeleton, Stack, Tile, Grid, Column, ClickableTile } from "@carbon/react";
 import { useDailyPuzzles } from "../hooks/useDailyPuzzles";
 import { useSavedPuzzlesStore } from "../hooks/useSavedPuzzles";
 import { History } from "../components/History";
 import { SudokuCard } from "../components/SudokuCard";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const RecentTile = () => {
   const { savedGames: savedPuzzles, removePuzzle } = useSavedPuzzlesStore();
@@ -63,26 +65,45 @@ const DailyPuzzlesTile = () => {
 }
 
 const GeneratorTile = () => {
+  const navigate = useNavigate();
   return (
-    <Tile>
       <Stack gap={4}>
-        <h4>Generator</h4>
-        <p>Unimplemented :(</p>
+        <h4>Generate</h4>
+        <p>Create a custom puzzle</p>
+        <ButtonSet >
+          <Button kind="tertiary" size="md" onClick={() => navigate('/play/difficulty/easy')}>
+            <Stack gap={4}>
+              Easy
+            </Stack>
+          </Button>
+          <Button kind="tertiary" size="md" onClick={() => navigate('/play/difficulty/moderate')}>
+            <Stack gap={4}>
+              Moderate
+            </Stack>
+          </Button>
+          <Button kind="tertiary" size="md" onClick={() => navigate('/play/difficulty/tough')}>
+            <Stack gap={4}>
+              Tough
+            </Stack>
+          </Button>
+          <Button kind="tertiary" size="md" onClick={() => navigate('/play/difficulty/hard')}>
+            <Stack gap={4}>
+              Hard
+            </Stack>
+          </Button>  
+        </ButtonSet>
       </Stack>
-    </Tile>
   );
 }
 
 export const SudokuPage = () => {
   return (
-    <Content>
       <Stack gap={4}>
         <h1>Sudoku</h1>
         <p>Pick up where you left off choose from a variety of puzzles from the library, or make your own puzzle to your desired specifications!</p>
         <RecentTile />
-        <DailyPuzzlesTile />
+        {/* <DailyPuzzlesTile /> */}
         <GeneratorTile />
       </Stack>
-    </Content>
   );
 }

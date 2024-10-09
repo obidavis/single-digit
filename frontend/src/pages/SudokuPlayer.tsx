@@ -1,54 +1,143 @@
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { SudokuPlayer } from "../components/Player";
-import { Content, Modal } from "@carbon/react";
-import { boardFromString, boardToShortString, validateBoardString, boardToLongString } from "../utils/sudokuUtils";
+import { Content, Header, HeaderContainer, HeaderGlobalAction, HeaderGlobalBar, HeaderMenuItem, HeaderName, HeaderNavigation, Loading, Modal } from "@carbon/react";
+import { boardFromString, boardToShortString, difficultyDescription, validateBoardString } from "../utils/sudokuUtils";
 import { Error } from "../components/Error";
 import { useSavedPuzzlesStore } from "../hooks/useSavedPuzzles";
 import { useCallback, useEffect, useState, useMemo } from "react";
-import defaultPuzzles from "../data/defaultPuzzles.json";
 import { PuzzleSet } from "../models/SudokuAPI";
 import { freshGameState } from "../models/Sudoku";
+import { ChevronLeft, Settings, Share } from "@carbon/react/icons";
 
-const { puzzles } = defaultPuzzles as PuzzleSet;
+export const renderPlayerUI = () => {
+  return (
+    <>
+      <Header aria-label='header'>
+        <HeaderName as={Link} to='/' prefix='' href='/'>
+          <ChevronLeft /> 
+        </HeaderName>
+        <HeaderNavigation aria-label='menu'>
+          <HeaderMenuItem as={Link} to={"/play"}>
+            Play
+          </HeaderMenuItem>
+        </HeaderNavigation>
+      </Header>
+      <Content style={{ maxWidth: 'none', justifyContent: 'center', padding: "1rem" }}>
+        <Outlet />
+      </Content>
+    </>
+  )
+}
+
+interface LocationState {
+  resume?: boolean;
+  difficulty?: number;
+  solution?: string;
+}
+
+const fetchGeneratedPuzzle = (difficulty: string) => {
+  return fetch('/api/generate',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ difficulty })
+    }
+  ).then(response => response.json());
+}
 
 export const SudokuPlayerPage = () => {
+  const { board, level } = useParams();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const boardParam = useMemo(() => searchParams.has('board') ? searchParams.get('board')! : puzzles[0].clues, []);
-  const savedPuzzle = useSavedPuzzlesStore.getState().savedGames[boardParam];
-  const hasSavedProgress = savedPuzzle !== undefined;
-  const removePuzzle = useSavedPuzzlesStore(useCallback((state) => state.removePuzzle, []));
-  
   const location = useLocation();
-  const resume = location.state?.resume;
+  const { resume, difficulty, solution } = (location.state || {}) as LocationState;
+  const [loading, setLoading] = useState(false);
+  const removePuzzle = useSavedPuzzlesStore((state) => state.removePuzzle);
+  const savedPuzzle = board !== undefined ? useSavedPuzzlesStore.getState().savedGames[board] : undefined;
+  const hasSavedProgress = Boolean(savedPuzzle);
 
-  const gameState = resume && hasSavedProgress ? savedPuzzle : freshGameState({ clues: boardParam, solution: '', difficulty: 0 });
 
   const handleStartOver = useCallback(() => {
-    removePuzzle(boardParam);
-    navigate(`?board=${boardParam}`, { replace: true });
-  }, [boardParam, removePuzzle]);
+    removePuzzle(board!);
+    navigate(`/play/${board}`, { replace: true, state: { resume: false } });
+  }, [board, removePuzzle, navigate]);
 
   const handleContinue = useCallback(() => {
-    if (boardParam === null) {
-      return;
+    navigate(`/play/${board}`, { state: { resume: true } });
+  }, [board, navigate]);
+
+  // Fetch puzzle if no board is provided
+  useEffect(() => {
+    if (!board) {
+      setLoading(true);
+      fetchGeneratedPuzzle(level || "any")
+        .then((puzzles: PuzzleSet) => {
+          const { clues, solution, difficulty } = puzzles.puzzles[0];
+          setLoading(false);
+          navigate(`/play/${clues}`, { replace: true, state: { difficulty, solution } });
+        });
+    } else {
+      setLoading(false);
     }
-    navigate(`?board=${boardParam}`, { replace: true, state: { resume: true } });
-  }, [boardParam, navigate]);
+  }, [board, level, navigate]);
+
+  // Define the initial game state
+  const gameState = (() => {
+    console.log("gameState", { resume, savedPuzzle, board, solution, difficulty });
+    if (resume && savedPuzzle) {
+      return savedPuzzle;
+    }
+    return freshGameState({
+      clues: board || "",
+      solution: solution || "",
+      difficulty: difficulty || 0,
+    });
+  })();
+
+  if (board && !validateBoardString(board)) {
+    return <Error message="Invalid board string" />;
+  }
+
+  if (loading) {
+    return <Loading description="Loading puzzle" withOverlay active />;
+  }
 
   return (
-    <Content style={{maxWidth: 'none', justifyContent: 'center', padding: "1rem"}}>
-      <SudokuPlayer initialState={gameState!} />
-      <Modal 
-        open={resume === undefined && hasSavedProgress}
+    <>
+    <HeaderContainer render={() => (
+      <>
+        <Header aria-label='header' className="play-header">
+          <HeaderGlobalAction aria-label="Back" onClick={() => navigate("/")} tooltipAlignment="start">
+            <ChevronLeft /> 
+          </HeaderGlobalAction>
+          <HeaderName as={Link} to='/' prefix="SingleDigit">
+            Sudoku
+          </HeaderName>
+          <span style={{ width: "100%", textAlign: "center" }}>
+            {`Difficulty: ${difficultyDescription(gameState.puzzle.difficulty)}`}</span>
+          <HeaderGlobalBar>
+            <HeaderGlobalAction aria-label="Share" onClick={() => {}} tooltipAlignment="center">
+              <Share />
+            </HeaderGlobalAction>
+            <HeaderGlobalAction aria-label="Settings" onClick={() => {}} tooltipAlignment="end">
+              <Settings />
+            </HeaderGlobalAction>
+          </HeaderGlobalBar>
+        </Header>
+      </>
+    )} />
+    <Content style={{ maxWidth: 'none', justifyContent: 'center', padding: "1rem" }}>
+      <SudokuPlayer initialState={gameState} key={resume ? "1" : "0"} />
+      <Modal
+        open={hasSavedProgress && !resume}
         modalHeading="Continue?"
         primaryButtonText="Continue"
         secondaryButtonText="Start Over"
         onRequestClose={handleStartOver}
         onRequestSubmit={handleContinue}
-      >
-        <p>You have a saved game. Would you like to continue where you left off?</p>
-      </Modal>
+      />
     </Content>
+    </>
   );
 };

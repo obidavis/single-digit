@@ -29,13 +29,12 @@ const ActionButtons = ({ boardString: board, onRemove }: ActionButtonsProps) => 
       <Button 
         as={Link} 
         to={{
-          pathname: '/play',
-          search: `?board=${board}`
+          pathname: `/play/${board}`,
         }} 
         state={{ resume: true }}
         renderIcon={Play} hasIconOnly 
-        kind="ghost" 
-        iconDescription='Play' 
+        kind="primary" 
+        iconDescription='Resume' 
         />
       <Button onClick={onRemove} renderIcon={TrashCan} hasIconOnly kind="danger" iconDescription='Delete'/>
     </>
@@ -55,22 +54,14 @@ export const History = ({ savedPuzzles, onRemove }: SudokuHistoryProps) => {
     return Math.floor(filled / numNonClues * 100);
   };
 
-  const rows = Object.entries(savedPuzzles)
-    .map(([id, state]) => {
-      const progress = calculateProgress(state);
-      return {
-        id: id,
-        board: <BoardView board={state} />,
-        lastPlayed: new Date(savedPuzzles[id].lastPlayed).toLocaleString(),
-        progress: <ProgressBar label={`${progress}%`} value={progress} />,
-        actions: <ActionButtons boardString={state.puzzle.clues} onRemove={() => onRemove(id)} />
-      };
-    });
-
   const headers = [
     {
       key: 'board',
       header: '',
+    },
+    {
+      key: 'difficulty',
+      header: 'Difficulty'
     },
     {
       key: 'lastPlayed',
@@ -86,10 +77,24 @@ export const History = ({ savedPuzzles, onRemove }: SudokuHistoryProps) => {
     }
   ];
 
+  const rows = Object.entries(savedPuzzles)
+    .map(([id, state]) => {
+      const progress = calculateProgress(state);
+      return {
+        id: id,
+        board: <BoardView cells={state.cells} />,
+        lastPlayed: new Date(savedPuzzles[id].lastPlayed).toLocaleString(),
+        progress: <ProgressBar label={`${progress}%`} value={progress} />,
+        difficulty: state.puzzle.difficulty === null ? 'Unknown' : state.puzzle.difficulty,
+        actions: <ActionButtons boardString={state.puzzle.clues} onRemove={() => onRemove(id)} />
+      };
+    });
+
+
   if (rows.length === 0) {
     return <p>No saved games</p>;
   }
-  
+
   return (
     <>
       <DataTable rows={rows} headers={headers}>

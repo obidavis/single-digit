@@ -11,7 +11,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { Puzzle } from '../models/SudokuAPI';
 import { freshGameState } from '../models/Sudoku';
-import { boardToShortString } from '../utils/sudokuUtils';
+import { difficultyDescription } from '../utils/sudokuUtils';
 import "../styles/SudokuCard.scss";
 
 export interface SudokuCardProps {
@@ -22,14 +22,23 @@ export const SudokuCard = ({ puzzle }: SudokuCardProps) => {
   const navigate = useNavigate();
 
   const handleClick = useCallback(() => {
-    navigate(`/play?board=${puzzle.clues}`);
+    navigate(`/play/${puzzle.clues}`);
   }, [navigate]);
 
+  const difficulty = puzzle.difficulty === null ? 'Unknown' : difficultyDescription(puzzle.difficulty);
+  const cells = puzzle.clues.split('').map((value, index) => {
+    return {
+      index,
+      value: value === '0' ? 0 : parseInt(value),
+      candidates: new Array(9).fill(false),
+      isClue: value !== '0',
+    };
+  });
   return (
-    <ClickableTile className='sudoku-card' onClick={handleClick} hasRoundedCorners={true} slug>
+    <ClickableTile className='sudoku-card' onClick={handleClick} >
       <Stack gap={4}>
-        <BoardView board={freshGameState(puzzle)} />
-        <p>Difficulty: {puzzle.difficulty}</p>
+        <BoardView cells={cells} />
+        <p>{difficulty}</p>
       </Stack>
     </ClickableTile>
   )
