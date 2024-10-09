@@ -1,34 +1,28 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState, useRef, useContext, useMemo } from 'react'
 import { BoardView, BoardViewProps } from './Player/BoardView'
 import { SudokuCell, SudokuGameState } from '../models/Sudoku';
 import { Controls, ControlsProps } from './Player/Controls';
+
 import { produce } from 'immer';
 import { useHistoryState } from '@uidotdev/usehooks';
 import { indexToBoxIndex, indexToRowAndCol, indexToRowIndex, rowAndColToIndex, indexToColIndex, removeSolvedCellsFromCandidates } from '../utils/sudokuUtils';
 import { useSavedPuzzlesStore } from '../hooks/useSavedPuzzles';
 import "../styles/Player.scss";
+import { useSudokuStore } from '../hooks/useSudokuStore';
 
 
-export interface SudokuParams {
+export interface SudokuPlayerProps {
   initialState: SudokuGameState;
 }
 
-interface InProgressPuzzle {
-  state: SudokuGameState;
-}
 
-export const SudokuPlayer = ({ initialState }: SudokuParams) => {
+export const SudokuPlayer = ({ initialState }: SudokuPlayerProps) => {
   const { state, undo, redo, canRedo, canUndo, set, clear } = useHistoryState<SudokuGameState>(initialState);
-  useEffect(() => {
-    clear();
-    set(initialState);
-  }, [initialState, set, clear]);
-  const { savePuzzle } = useSavedPuzzlesStore();
+  const savePuzzle = useSavedPuzzlesStore(state => state.savePuzzle);
   const [selectedIndex, setSelectedIndex] = useState<number | undefined>(undefined);
   const [isNoteMode, setIsNoteMode] = useState(false);
   const [autoCandidates, setAutoCandidates] = useState(false);
-
-  const applyAutoCandidates = useCallback(() => {
+  const applyAutoCandidates = () => {
     if (!autoCandidates) {
       return;
     }
@@ -52,87 +46,81 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
       });
     });
     set(newBoard);
-  }, [state, set, autoCandidates, savePuzzle]);
+  };
 
-  const setCellValue = useCallback((value: number) => {
+  const updateCell = (updateFn: (cell: SudokuCell) => SudokuCell) => {
     if (selectedIndex !== undefined) {
-      if (state.cells[selectedIndex].isClue) {
-        return;
-      }
       const newBoard = produce(state, draft => {
-        draft.cells[selectedIndex].value = value;
-        draft.cells[selectedIndex].candidates = Array(9).fill(false);
-        if (autoCandidates) {
-          removeSolvedCellsFromCandidates(draft);
-        }
+        draft.cells[selectedIndex] = updateFn(draft.cells[selectedIndex]);
         draft.lastPlayed = new Date().getTime();
       });
       set(newBoard);
       savePuzzle(newBoard);
     }
-  }, [selectedIndex, state, set, savePuzzle, autoCandidates]);
+  };
 
-  const toggleCandidate = useCallback((candidate: number) => {
-    if (selectedIndex !== undefined) {
-      if (state.cells[selectedIndex].isClue) {
-        return;
+  const setCellValue = (value: number) => 
+    updateCell(cell => (
+      {
+        ...cell,
+        value,
+        candidates: Array(9).fill(false)
       }
-      const newBoard = produce(state, draft => {
-        draft.cells[selectedIndex].value = 0;
-        draft.cells[selectedIndex].candidates[candidate - 1] = !draft.cells[selectedIndex].candidates[candidate - 1];
-        draft.lastPlayed = new Date().getTime();
-      });
-      set(newBoard);
-      savePuzzle(newBoard);
-    }
-  }, [selectedIndex, state, set, savePuzzle]);
+    )
+  );
 
-  const handleNumberInput = useCallback((value: number) => {
+
+  const toggleCandidate = (candidate: number) => 
+    updateCell(cell => (
+      {
+        ...cell,
+        value: 0,
+        candidates: cell.candidates.map((c, i) => i === candidate ? !c : c)
+      }
+    )
+  );
+
+
+  const handleNumberInput = (value: number) => {
     if (isNoteMode) {
       toggleCandidate(value);
     }
     else {
       setCellValue(value);
     }
-  }, [isNoteMode, setCellValue, toggleCandidate]);
+  };
 
-  const eraseCell = useCallback(() => {
-    if (selectedIndex !== undefined) {
-      if (state.cells[selectedIndex].isClue) {
-        return;
+  const eraseCell = () => 
+    updateCell(cell => (
+      {
+        ...cell,
+        value: 0,
+        candidates: Array(9).fill(false)
       }
-      const newBoard = produce(state, draft => {
-        const cell = draft.cells[selectedIndex];
-        if (!cell.isClue) {
-          cell.value = 0;
-          cell.candidates = Array(9).fill(false);
-        }
-      });
-      set(newBoard);
-    }
-  }, [selectedIndex, state, set]);
+    )
+  );
 
-  const handleNoteModeToggle = useCallback(() => {
+  const handleNoteModeToggle = () => {
     setIsNoteMode(!isNoteMode);
-  }, [isNoteMode]);
+  };
 
-  const advanceToNextCell = useCallback(() => { 
+  const advanceToNextCell = () => { 
     const index = selectedIndex === undefined ? 0 : selectedIndex + 1;
     const reordered = state.cells.slice(index).concat(state.cells.slice(0, index));
     const nextIndex = reordered.findIndex(cell => cell.value === 0);
     if (nextIndex !== -1) {
       setSelectedIndex(reordered[nextIndex].index);
     }
-  }, [selectedIndex, state]);
+  };
 
-  const retreatToPrevCell = useCallback(() => {
+  const retreatToPrevCell = () => {
     const index = selectedIndex === undefined ? 0 : selectedIndex;
     const reordered = state.cells.slice(index).concat(state.cells.slice(0, index));
     const prevIndex = reordered.slice().reverse().findIndex(cell => cell.value === 0);
     if (prevIndex !== -1) {
       setSelectedIndex(reordered[reordered.length - prevIndex - 1].index);
     }
-  }, [selectedIndex, state]);
+  };
 
   useEffect(() => {
     const keyDownHandler = (event: KeyboardEvent) => {
@@ -173,7 +161,7 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
   }, [eraseCell, handleNumberInput, advanceToNextCell, retreatToPrevCell, handleNoteModeToggle, selectedIndex, setSelectedIndex, undo, redo]);
 
   const boardProps: BoardViewProps = {
-    board: state,
+    cells: state.cells,
     selectedIndex: selectedIndex,
     onCellClick: (cell: SudokuCell) => setSelectedIndex(cell.index)
   };
@@ -191,12 +179,9 @@ export const SudokuPlayer = ({ initialState }: SudokuParams) => {
     onNoteToggle: handleNoteModeToggle,
     onRedo: redo,
     onUndo: undo,
-    onToggleAutoCandidates: useCallback(() => {
+    onToggleAutoCandidates: () => {
       setAutoCandidates(!autoCandidates);
-      if (autoCandidates) {
-        applyAutoCandidates();
-      }
-    }, [autoCandidates, applyAutoCandidates]),
+    },
     autoCandidates: autoCandidates
   };
 

@@ -12,22 +12,22 @@ const boxIndices = Array.from(Array(81).keys()).map((i) => {
 });
 
 export interface BoardViewProps {
-  board: SudokuGameState;
+  cells: SudokuCell[];
   selectedIndex?: number;
   onCellClick?: (cell: SudokuCell) => void;
 }
 
-export const BoardView = ({ board, selectedIndex, onCellClick: onClick = () => {}}: BoardViewProps) => {
+export const BoardView = ({ cells, selectedIndex, onCellClick: onClick = () => {}}: BoardViewProps) => {
   const selectedRow = selectedIndex && indexToRowIndex(selectedIndex);
   const selectedCol = selectedIndex && indexToColIndex(selectedIndex);
   const selectedBox = selectedIndex && indexToBoxIndex(selectedIndex);
 
-  const cellProps = board.cells.map((cell, index): CellViewProps => {
+  const cellProps = cells.map((cell, index): CellViewProps => {
     const isHighlightedByPosition =
       selectedRow === indexToRowIndex(index) ||
       selectedCol === indexToColIndex(index) ||
       selectedBox === indexToBoxIndex(index);
-    const isHighlightedByValue = selectedIndex !== undefined && (cell.value > 0) && cell.value === board.cells[selectedIndex].value;
+    const isHighlightedByValue = selectedIndex !== undefined && (cell.value > 0) && cell.value === cells[selectedIndex].value;
     const isSelected = selectedIndex === index;
     
     return {
