@@ -1,4 +1,4 @@
-import './App.scss';
+import './styles/App.scss';
 import {
   ClassPrefix,
   Content,
@@ -9,25 +9,32 @@ import {
   HeaderName,
   HeaderNavigation,
   HeaderSideNavItems,
+  IconButton,
   SideNav,
   SideNavItems,
 } from '@carbon/react';
 
+import {
+  ArrowLeft,
+  ChevronLeft
+} from '@carbon/icons-react';
+
 
 import { SudokuPage } from './pages/SudokuPage';
-import { SudokuPlayerPage } from './pages/SudokuPlayer';
+import { renderPlayerUI, SudokuPlayerPage } from './pages/SudokuPlayer';
 import { SudokuHistoryPage } from './pages/SudokuHistory';
 import { SudokuGeneratorPage } from './pages/SudokuGenerator';
-import { Link, Outlet, Route, Routes } from 'react-router-dom';
+import { Library } from './pages/Library';
+import { Link, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import { HeaderContainerRenderProps } from '@carbon/react/lib/components/UIShell/HeaderContainer';
 
-function renderUI({ isSideNavExpanded, onClickSideNavExpand }: HeaderContainerRenderProps) {
+function renderMainUI({ isSideNavExpanded, onClickSideNavExpand }: HeaderContainerRenderProps) {
   return (
     <>
       <Header aria-label='header'>
         <HeaderMenuButton aria-label='Expand menu' onClick={onClickSideNavExpand} isActive={isSideNavExpanded} aria-expanded={isSideNavExpanded}/>
-        <HeaderName prefix='' href='/'>
-          SingleDigit
+        <HeaderName prefix='SingleDigit' href='/'>
+          Sudoku
         </HeaderName>
         <HeaderNavigation aria-label='menu'>
           <HeaderMenuItem as={Link} to={"/"}>
@@ -74,20 +81,26 @@ function renderUI({ isSideNavExpanded, onClickSideNavExpand }: HeaderContainerRe
         </SideNavItems>}
       </SideNav>
       </Header>
+      <Content>
+        <Outlet />
+      </Content>
     </>
   );
 }
 
 export const App = () => (
-  <>
-    <HeaderContainer render={renderUI} />
-    <Routes>
+  <Routes>
+    <Route element={<HeaderContainer render={renderMainUI} />} >
       <Route path="/" element={<SudokuPage />} />
-      <Route path="/play" element={<SudokuPlayerPage />} />
       <Route path="/about" element={<p>About</p>} />
       <Route path="/history" element={<SudokuHistoryPage />} />
-      <Route path="/library" element={<p>Library</p>} />
+      <Route path="/library" element={<Library />} />
       <Route path="/generator" element={<SudokuGeneratorPage />} />
-    </Routes>
-  </>
+    </Route>
+    {/* <Route element={<HeaderContainer render={renderPlayerUI} />} > */}
+      <Route path="/play" element={<SudokuPlayerPage />} />
+      <Route path="/play/:board" element={<SudokuPlayerPage />} />
+      <Route path="/play/difficulty/:level" element={<SudokuPlayerPage />} />
+    {/* </Route> */}
+  </Routes>
 )
