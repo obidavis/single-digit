@@ -170,7 +170,7 @@ export const SudokuPlayer = ({ initialState }: SudokuPlayerProps) => {
 
   const controlsProps: ControlsProps = {
     candidateMode: isNoteMode,
-    canErase: selectedIndex !== undefined && !state.cells[selectedIndex].isClue,
+    canErase: selectedIndex !== undefined && !state.cells[selectedIndex].isClue && (state.cells[selectedIndex].value !== 0 || state.cells[selectedIndex].candidates.some(c => c)),
     canUndo: canUndo,
     canRedo: canRedo,
     selectedNumbers: currentSelection,
