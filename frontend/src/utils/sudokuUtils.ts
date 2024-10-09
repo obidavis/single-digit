@@ -128,3 +128,19 @@ export const removeSolvedCellsFromCandidates = (board: SudokuGameState): void =>
     });
   });
 }
+
+export const difficultyDescription = (difficulty: number | null | undefined): string => {
+  if (!difficulty) {
+    return 'Unknown';
+  }
+  if (difficulty < 50) {
+    return 'Easy';
+  }
+  if (difficulty < 75) {
+    return 'Moderate';
+  }
+  if (difficulty < 125) {
+    return 'Tough';
+  }
+  return 'Hard';
+}
