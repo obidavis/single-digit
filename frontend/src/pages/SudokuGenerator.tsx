@@ -56,7 +56,6 @@ export const SudokuGeneratorPage = () => {
       .catch(error => setError(error));
   }
   return (
-    <Content>
       <Stack gap={10}>
         <Form onSubmit={handleSubmit} >
           <Stack gap={5}>
@@ -85,6 +84,5 @@ export const SudokuGeneratorPage = () => {
           ))
         )}
       </Stack>
-    </Content>
   );
 }
