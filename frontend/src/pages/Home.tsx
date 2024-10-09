@@ -1,4 +1,4 @@
-import { Content, Button, ButtonSet, ButtonSkeleton, Stack, Tile, Grid, Column, ClickableTile } from "@carbon/react";
+import { Content, Button, ButtonSet, ButtonSkeleton, Stack, Tile, Grid, Column, ClickableTile, FlexGrid, Row } from "@carbon/react";
 import { useDailyPuzzles } from "../hooks/useDailyPuzzles";
 import { useSavedPuzzlesStore } from "../hooks/useSavedPuzzles";
 import { History } from "../components/History";
@@ -16,7 +16,11 @@ const RecentTile = () => {
     <Tile>
       <Stack gap={4}>
         <h4>Recent</h4>
-        <History savedPuzzles={Object.fromEntries(recentPuzzles)} onRemove={removePuzzle}/>
+        <div>
+          {recentPuzzles.map(([id, puzzle], i) => (
+              <SudokuCard key={id} puzzle={puzzle.puzzle} resume/>
+          ))}
+        </div>
       </Stack>
     </Tile>
   );

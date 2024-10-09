@@ -16,14 +16,15 @@ import "../styles/SudokuCard.scss";
 
 export interface SudokuCardProps {
   puzzle: Puzzle;
+  resume?: boolean;
 };
 
-export const SudokuCard = ({ puzzle }: SudokuCardProps) => {
+export const SudokuCard = ({ puzzle, resume }: SudokuCardProps) => {
   const navigate = useNavigate();
 
-  const handleClick = useCallback(() => {
-    navigate(`/play/${puzzle.clues}`);
-  }, [navigate]);
+  const handleClick = () => {
+    navigate(`/play/${puzzle.clues}`, { state: { resume }});
+  };
 
   const difficulty = puzzle.difficulty === null ? 'Unknown' : difficultyDescription(puzzle.difficulty);
   const cells = puzzle.clues.split('').map((value, index) => {
@@ -35,11 +36,13 @@ export const SudokuCard = ({ puzzle }: SudokuCardProps) => {
     };
   });
   return (
-    <ClickableTile className='sudoku-card' onClick={handleClick} >
-      <Stack gap={4}>
-        <BoardView cells={cells} />
-        <p>{difficulty}</p>
-      </Stack>
-    </ClickableTile>
+    <div className='sudoku-card'>
+      <a onClick={handleClick} >
+        <Stack gap={4}>
+          <BoardView cells={cells} />
+          <p>{difficulty}</p>
+        </Stack>
+      </a>
+    </div>
   )
 }
