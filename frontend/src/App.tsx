@@ -77,7 +77,7 @@ function renderMainUI({ isSideNavExpanded, onClickSideNavExpand }: HeaderContain
 export const App = () => (
   <Routes>
     <Route element={<HeaderContainer render={renderMainUI} />} >
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<HomePage />} />
       <Route path="/about" element={<p>About</p>} />
       <Route path="/history" element={<HistoryPage />} />
       <Route path="/generator" element={<GeneratorPage />} />
