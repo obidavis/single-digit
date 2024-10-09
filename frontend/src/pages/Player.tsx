@@ -6,7 +6,7 @@ import { Error } from "../components/Error";
 import { useSavedPuzzlesStore } from "../hooks/useSavedPuzzles";
 import { useCallback, useEffect, useState, useMemo } from "react";
 import { PuzzleSet } from "../models/SudokuAPI";
-import { freshGameState } from "../models/Sudoku";
+import { freshGameState, SudokuGameState } from "../models/Sudoku";
 import { ChevronLeft, Settings, Share } from "@carbon/react/icons";
 
 export const renderPlayerUI = () => {
@@ -31,8 +31,7 @@ export const renderPlayerUI = () => {
 
 interface LocationState {
   resume?: boolean;
-  difficulty?: number;
-  solution?: string;
+  state?: SudokuGameState;
 }
 
 const fetchGeneratedPuzzle = (difficulty: string) => {
@@ -51,13 +50,13 @@ export const PlayerPage = () => {
   const { board, level } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { resume, difficulty, solution } = (location.state || {}) as LocationState;
+  const { resume, state } = (location.state || {}) as LocationState;
   const [loading, setLoading] = useState(false);
   const removePuzzle = useSavedPuzzlesStore((state) => state.removePuzzle);
   const savedPuzzle = board !== undefined ? useSavedPuzzlesStore.getState().savedGames[board] : undefined;
   const hasSavedProgress = Boolean(savedPuzzle);
 
-
+  
   const handleStartOver = useCallback(() => {
     removePuzzle(board!);
     navigate(`/play/${board}`, { replace: true, state: { resume: false } });
@@ -75,7 +74,8 @@ export const PlayerPage = () => {
         .then((puzzles: PuzzleSet) => {
           const { clues, solution, difficulty } = puzzles.puzzles[0];
           setLoading(false);
-          navigate(`/play/${clues}`, { replace: true, state: { difficulty, solution } });
+          const state = freshGameState({ clues, solution, difficulty });
+          navigate(`/play/${clues}`, { replace: true, state: { state } });
         });
     } else {
       setLoading(false);
@@ -84,23 +84,14 @@ export const PlayerPage = () => {
 
   // Define the initial game state
   const gameState = (() => {
-    console.log("gameState", { resume, savedPuzzle, board, solution, difficulty });
     if (resume && savedPuzzle) {
       return savedPuzzle;
     }
-    return freshGameState({
-      clues: board || "",
-      solution: solution || "",
-      difficulty: difficulty || 0,
-    });
+    return state;
   })();
 
   if (board && !validateBoardString(board)) {
     return <Error message="Invalid board string" />;
-  }
-
-  if (loading) {
-    return <Loading description="Loading puzzle" withOverlay active />;
   }
 
   return (
@@ -128,7 +119,7 @@ export const PlayerPage = () => {
       </>
     )} />
     <Content style={{ maxWidth: 'none', justifyContent: 'center', padding: "1rem" }}>
-      <SudokuPlayer initialState={gameState} key={resume ? "1" : "0"} />
+      <SudokuPlayer initialState={gameState} key={`player${resume && "-resumed"}${gameState && "-initialised"}`} />
       <Modal
         open={hasSavedProgress && !resume}
         modalHeading="Continue?"

@@ -9,10 +9,11 @@ import { indexToBoxIndex, indexToRowAndCol, indexToRowIndex, rowAndColToIndex, i
 import { useSavedPuzzlesStore } from '../hooks/useSavedPuzzles';
 import "../styles/Player.scss";
 import { useSudokuStore } from '../hooks/useSudokuStore';
+import { Loading } from '@carbon/react';
 
 
 export interface SudokuPlayerProps {
-  initialState: SudokuGameState;
+  initialState?: SudokuGameState;
 }
 
 
@@ -22,6 +23,7 @@ export const SudokuPlayer = ({ initialState }: SudokuPlayerProps) => {
   const [selectedIndex, setSelectedIndex] = useState<number | undefined>(undefined);
   const [isNoteMode, setIsNoteMode] = useState(false);
   const [autoCandidates, setAutoCandidates] = useState(false);
+
   const applyAutoCandidates = () => {
     if (!autoCandidates) {
       return;
@@ -161,7 +163,7 @@ export const SudokuPlayer = ({ initialState }: SudokuPlayerProps) => {
   }, [eraseCell, handleNumberInput, advanceToNextCell, retreatToPrevCell, handleNoteModeToggle, selectedIndex, setSelectedIndex, undo, redo]);
 
   const boardProps: BoardViewProps = {
-    cells: state.cells,
+    cells: state.cells || Array(81).fill({ value: 0, candidates: Array(9).fill(false), isClue: false }),
     selectedIndex: selectedIndex,
     onCellClick: (cell: SudokuCell) => setSelectedIndex(cell.index)
   };
@@ -186,13 +188,15 @@ export const SudokuPlayer = ({ initialState }: SudokuPlayerProps) => {
   };
 
   return (
-    <div className='sudoku-player'>
-      <div className='sudoku-stretch'>
-        <BoardView {...boardProps} />
+    <>
+      <Loading active={!initialState} />
+      <div className='sudoku-player'>
+        <div className='sudoku-stretch'>
+          <BoardView {...boardProps} />
+        </div>
+          <Controls {...controlsProps} />
       </div>
-        <Controls {...controlsProps} />
-    </div>
+    </>
   )
 }
-
 export { SudokuPlayer as Sudoku };
