@@ -19,16 +19,16 @@ import {
   SideNavLinkText,
   SideNavMenuItem,
 } from '@carbon/react';
-
-
-import { SudokuPage } from './pages/SudokuPage';
-import { renderPlayerUI, SudokuPlayerPage } from './pages/SudokuPlayer';
-import { SudokuHistoryPage } from './pages/SudokuHistory';
-import { SudokuGeneratorPage } from './pages/SudokuGenerator';
-import { Library } from './pages/Library';
-import { Link, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import { HeaderContainerRenderProps } from '@carbon/react/lib/components/UIShell/HeaderContainer';
-import { Home, Query, RecentlyViewed, ToolKit, Information, Chemistry } from '@carbon/react/icons';
+import { 
+  Link, 
+  Outlet, 
+  Route, 
+  Routes, 
+  useNavigate 
+} from 'react-router-dom';
+import { Home, RecentlyViewed, Information, Chemistry } from '@carbon/react/icons';
+import { HomePage, PlayerPage, GeneratorPage, HistoryPage } from './pages';
 
 function renderMainUI({ isSideNavExpanded, onClickSideNavExpand }: HeaderContainerRenderProps) {
   return (
@@ -77,15 +77,15 @@ function renderMainUI({ isSideNavExpanded, onClickSideNavExpand }: HeaderContain
 export const App = () => (
   <Routes>
     <Route element={<HeaderContainer render={renderMainUI} />} >
-      <Route path="/" element={<SudokuPage />} />
+      <Route path="/" element={<Home />} />
       <Route path="/about" element={<p>About</p>} />
-      <Route path="/history" element={<SudokuHistoryPage />} />
-      <Route path="/generator" element={<SudokuGeneratorPage />} />
+      <Route path="/history" element={<HistoryPage />} />
+      <Route path="/generator" element={<GeneratorPage />} />
     </Route>
     {/* <Route element={<HeaderContainer render={renderPlayerUI} />} > */}
-      <Route path="/play" element={<SudokuPlayerPage />} />
-      <Route path="/play/:board" element={<SudokuPlayerPage />} />
-      <Route path="/play/difficulty/:level" element={<SudokuPlayerPage />} />
+      <Route path="/play" element={<PlayerPage />} />
+      <Route path="/play/:board" element={<PlayerPage />} />
+      <Route path="/play/difficulty/:level" element={<PlayerPage />} />
     {/* </Route> */}
   </Routes>
 )

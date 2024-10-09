@@ -70,7 +70,7 @@ const GeneratorTile = () => {
       <Stack gap={4}>
         <h4>Generate</h4>
         <p>Create a custom puzzle</p>
-        <ButtonSet >
+        <ButtonSet stacked>
           <Button kind="tertiary" size="md" onClick={() => navigate('/play/difficulty/easy')}>
             <Stack gap={4}>
               Easy
@@ -96,7 +96,7 @@ const GeneratorTile = () => {
   );
 }
 
-export const SudokuPage = () => {
+export const HomePage = () => {
   return (
       <Stack gap={4}>
         <h1>Sudoku</h1>

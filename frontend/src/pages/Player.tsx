@@ -47,7 +47,7 @@ const fetchGeneratedPuzzle = (difficulty: string) => {
   ).then(response => response.json());
 }
 
-export const SudokuPlayerPage = () => {
+export const PlayerPage = () => {
   const { board, level } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -114,8 +114,8 @@ export const SudokuPlayerPage = () => {
           <HeaderName as={Link} to='/' prefix="SingleDigit">
             Sudoku
           </HeaderName>
-          <span style={{ width: "100%", textAlign: "center" }}>
-            {`Difficulty: ${difficultyDescription(gameState.puzzle.difficulty)}`}</span>
+          {/* <span style={{ width: "100%", textAlign: "center" }}>
+            {`Difficulty: ${difficultyDescription(gameState.puzzle.difficulty)}`}</span> */}
           <HeaderGlobalBar>
             <HeaderGlobalAction aria-label="Share" onClick={() => {}} tooltipAlignment="center">
               <Share />

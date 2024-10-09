@@ -30,7 +30,7 @@ interface GeneratorResults {
   
 }
 
-export const SudokuGeneratorPage = () => {
+export const GeneratorPage = () => {
   const [results, setResults] = useState<GeneratorResults | null>();
   const [error, setError] = useState<string | null>();
   const [loading, setLoading] = useState(false);
