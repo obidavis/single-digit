@@ -32,7 +32,7 @@ declare type SolutionStep = {
 declare type Puzzle = {
   clues: string;
   solution: string;
-  difficulty: number;
+  difficulty: number | null;
   solutionPath?: SolutionStep[];
 }
 
@@ -45,6 +45,7 @@ declare type DailyPuzzles = {
   easy: Puzzle;
   moderate: Puzzle;
   tough: Puzzle;
+  hard: Puzzle;
 }
 
 export type { CellIndex, Elimination, Solution, SolutionStep, Puzzle, PuzzleSet, DailyPuzzles };
