@@ -2,20 +2,24 @@ import { useEffect, useState, useRef, useContext, useMemo } from 'react'
 import { BoardView, BoardViewProps } from './Player/BoardView'
 import { SudokuCell, SudokuGameState } from '../models/Sudoku';
 import { Controls, ControlsProps } from './Player/Controls';
-
+import { useNavigate } from 'react-router-dom';
 import { produce } from 'immer';
 import { useHistoryState } from '@uidotdev/usehooks';
 import { indexToBoxIndex, indexToRowAndCol, indexToRowIndex, rowAndColToIndex, indexToColIndex, removeSolvedCellsFromCandidates } from '../utils/sudokuUtils';
 import { useSavedPuzzlesStore } from '../hooks/useSavedPuzzles';
 import "../styles/Player.scss";
-import { useSudokuStore } from '../hooks/useSudokuStore';
-import { Loading } from '@carbon/react';
+import { Loading, Modal } from '@carbon/react';
 
 
 export interface SudokuPlayerProps {
   initialState?: SudokuGameState;
 }
 
+enum CompletionState {
+  InProgress,
+  Completed,
+  Error
+};
 
 export const SudokuPlayer = ({ initialState }: SudokuPlayerProps) => {
   const { state, undo, redo, canRedo, canUndo, set, clear } = useHistoryState<SudokuGameState>(initialState);
@@ -23,7 +27,8 @@ export const SudokuPlayer = ({ initialState }: SudokuPlayerProps) => {
   const [selectedIndex, setSelectedIndex] = useState<number | undefined>(undefined);
   const [isNoteMode, setIsNoteMode] = useState(false);
   const [autoCandidates, setAutoCandidates] = useState(false);
-
+  const [completionState, setCompletionState] = useState(CompletionState.InProgress);
+  const navigate = useNavigate();
   const applyAutoCandidates = () => {
     if (!autoCandidates) {
       return;
@@ -58,6 +63,14 @@ export const SudokuPlayer = ({ initialState }: SudokuPlayerProps) => {
       });
       set(newBoard);
       savePuzzle(newBoard);
+      if (newBoard.cells.every(cell => cell.value !== 0)) {
+        const solved = newBoard.cells.map(cell => cell.value).join('');
+        if (solved === newBoard.puzzle.solution) {
+          setCompletionState(CompletionState.Completed);
+        } else {
+          setCompletionState(CompletionState.Error);
+        }
+      } 
     }
   };
 
@@ -77,7 +90,7 @@ export const SudokuPlayer = ({ initialState }: SudokuPlayerProps) => {
       {
         ...cell,
         value: 0,
-        candidates: cell.candidates.map((c, i) => i === candidate ? !c : c)
+        candidates: cell.candidates.map((c, i) => i === candidate - 1 ? !c : c)
       }
     )
   );
@@ -196,6 +209,27 @@ export const SudokuPlayer = ({ initialState }: SudokuPlayerProps) => {
         </div>
           <Controls {...controlsProps} />
       </div>
+      <Modal  
+        open={completionState === CompletionState.Completed}
+        primaryButtonText="Return to Home"
+        secondaryButtonText="Admire Your Work"
+        modalHeading="Congratulations!"
+        onRequestClose={() => setCompletionState(CompletionState.InProgress)}
+        onRequestSubmit={() => navigate('/')}
+        size='sm'
+      >
+        <p>You have completed the puzzle!</p>
+      </Modal>
+      <Modal passiveModal
+        open={completionState === CompletionState.Error}
+        modalHeading="Almost..."
+        onRequestClose={() => setCompletionState(CompletionState.InProgress)}
+        size='sm'
+      >
+        <p>There seems to be an error in your solution. Keep trying!</p>
+      </Modal>
+
+
     </>
   )
 }
