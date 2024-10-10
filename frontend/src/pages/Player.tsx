@@ -118,7 +118,7 @@ export const PlayerPage = () => {
         </Header>
       </>
     )} />
-    <Content style={{ maxWidth: 'none', justifyContent: 'center', padding: "1rem" }}>
+    <Content style={{ maxWidth: 'none', justifyContent: 'center', padding: "1rem", height: "100%" }}>
       <SudokuPlayer initialState={gameState} key={`player${resume && "-resumed"}${gameState && "-initialised"}`} />
       <Modal
         open={hasSavedProgress && !resume}
@@ -127,7 +127,9 @@ export const PlayerPage = () => {
         secondaryButtonText="Start Over"
         onRequestClose={handleStartOver}
         onRequestSubmit={handleContinue}
-      />
+      >
+        <p>You have saved progress on this puzzle. Would you like to continue?</p>
+      </Modal>
     </Content>
     </>
   );

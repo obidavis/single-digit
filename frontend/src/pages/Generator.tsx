@@ -47,6 +47,7 @@ export const GeneratorPage = () => {
     fetch('/api/generate', {
       method: 'POST',
       body: data,
+      
     }).then(response => response.json())
       .then(data => {
         setResults(data);

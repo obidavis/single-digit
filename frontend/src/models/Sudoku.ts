@@ -11,6 +11,7 @@ declare type SudokuGameState = {
   puzzle: Puzzle;
   cells: SudokuCell[];
   solved: boolean;
+  firstPlayed: number;
   lastPlayed: number;
 };
 
@@ -24,7 +25,8 @@ export const freshGameState = (puzzle: Puzzle): SudokuGameState => {
       isClue: value !== 0,
     };
   });
-  return { puzzle, cells, solved: false, lastPlayed: new Date().getTime() };
+  const now = new Date().getTime();
+  return { puzzle, cells, solved: false, lastPlayed: now, firstPlayed: now };
 }
 
 export type { SudokuCell, SudokuGameState };

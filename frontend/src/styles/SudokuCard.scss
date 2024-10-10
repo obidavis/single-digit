@@ -1,9 +1,17 @@
 @use './App.scss' as *;
 
+.sudoku-card-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
 .sudoku-card {
-  margin: 1%;
+  height: 240px;
+  aspect-ratio: 0.8;
+  padding: 1rem;
   border-radius: 1em;
-  background-color: map-get($colours, pale-green1);
+  background-color: map-get($colours, pale-grey1);
   border: map-get($colours, black) 1px solid;
   &:hover {
     background-color: map-get($colours, pale-green0);

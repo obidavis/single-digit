@@ -10,16 +10,17 @@ import {
 } from "@carbon/react";
 import { useNavigate } from 'react-router-dom';
 import { Puzzle } from '../models/SudokuAPI';
-import { freshGameState } from '../models/Sudoku';
+import { freshGameState, SudokuCell } from '../models/Sudoku';
 import { difficultyDescription } from '../utils/sudokuUtils';
 import "../styles/SudokuCard.scss";
 
 export interface SudokuCardProps {
   puzzle: Puzzle;
+  cells?: SudokuCell[];
   resume?: boolean;
 };
 
-export const SudokuCard = ({ puzzle, resume }: SudokuCardProps) => {
+export const SudokuCard = ({ puzzle, resume, cells }: SudokuCardProps) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -27,7 +28,7 @@ export const SudokuCard = ({ puzzle, resume }: SudokuCardProps) => {
   };
 
   const difficulty = puzzle.difficulty === null ? 'Unknown' : difficultyDescription(puzzle.difficulty);
-  const cells = puzzle.clues.split('').map((value, index) => {
+  const defaultCells = puzzle.clues.split('').map((value, index) => {
     return {
       index,
       value: value === '0' ? 0 : parseInt(value),
@@ -36,13 +37,13 @@ export const SudokuCard = ({ puzzle, resume }: SudokuCardProps) => {
     };
   });
   return (
-    <div className='sudoku-card'>
-      <a onClick={handleClick} >
+    <ClickableTile className='sudoku-card'>
+      {/* <a onClick={handleClick} > */}
         <Stack gap={4}>
-          <BoardView cells={cells} />
+          <BoardView cells={cells || defaultCells} /> 
           <p>{difficulty}</p>
         </Stack>
-      </a>
-    </div>
+      {/* </a> */}
+    </ClickableTile>
   )
 }
