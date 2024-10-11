@@ -133,13 +133,13 @@ export const difficultyDescription = (difficulty: number | null | undefined): st
   if (!difficulty) {
     return 'Unknown';
   }
-  if (difficulty < 50) {
+  if (difficulty < 75) {
     return 'Easy';
   }
-  if (difficulty < 75) {
+  if (difficulty < 100) {
     return 'Moderate';
   }
-  if (difficulty < 125) {
+  if (difficulty < 200) {
     return 'Tough';
   }
   return 'Hard';
