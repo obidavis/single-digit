@@ -33,10 +33,15 @@ def daily_puzzle():
     date = datetime.now().strftime("%Y-%m-%d")
     seed = datetime.now().toordinal()
 
-    easy = generate_sudoku(seed=seed, count=1, difficulty='easy')
-    moderate = generate_sudoku(seed=seed, count=1, difficulty='moderate')
-    tough = generate_sudoku(seed=seed, count=1, difficulty='tough')
-    hard = generate_sudoku(seed=seed, count=1, difficulty='hard')
+    easy_options = GenerateOptions(seed=seed, count=1, difficulty='easy')
+    moderate_options = GenerateOptions(seed=seed, count=1, difficulty='moderate')
+    tough_options = GenerateOptions(seed=seed, count=1, difficulty='tough')
+    hard_options = GenerateOptions(seed=seed, count=1, difficulty='hard')
+
+    easy = generate_sudoku(easy_options)
+    moderate = generate_sudoku(moderate_options)
+    tough = generate_sudoku(tough_options)
+    hard = generate_sudoku(hard_options)
 
     puzzles = {
         "date": date,
