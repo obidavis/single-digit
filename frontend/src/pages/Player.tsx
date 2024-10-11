@@ -87,7 +87,9 @@ export const PlayerPage = () => {
     if (resume && savedPuzzle) {
       return savedPuzzle;
     }
-    return state;
+    if (state) {
+      return state;
+    }
   })();
 
   if (board && !validateBoardString(board)) {

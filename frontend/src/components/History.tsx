@@ -15,7 +15,7 @@ import { SudokuGameState } from '../models/Sudoku';
 import { boardFromString, boardToShortString, boardToLongString } from '../utils/sudokuUtils';
 import { Link } from 'react-router-dom';
 import { SavedPuzzles } from '../hooks/useSavedPuzzles';
-import { SudokuCard } from './SudokuCard';
+import { SudokuCard } from './GameCard';
 import { BoardView } from './Player/BoardView';
 
 interface ActionButtonsProps {

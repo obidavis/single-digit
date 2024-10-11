@@ -2,7 +2,7 @@ import { Content, Button, ButtonSet, ButtonSkeleton, Stack, Tile, Grid, Column, 
 import { useDailyPuzzles } from "../hooks/useDailyPuzzles";
 import { useSavedPuzzlesStore } from "../hooks/useSavedPuzzles";
 import { History } from "../components/History";
-import { SudokuCard } from "../components/SudokuCard";
+import { SudokuCard, SudokuCardList } from "../components/GameCard";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { BoardView } from "../components/Player/BoardView";
@@ -104,87 +104,41 @@ const GeneratorTile = () => {
   );
 }
 
-const formatDuration = (duration: number) => {
-  const seconds = duration / 1000;
-  const minutes = seconds / 60;
-  const wholeMinutes = Math.floor(minutes);
-  const hours = minutes / 60;
-  const wholeHours = Math.floor(hours);
-  const days = hours / 24;
-  const wholeDays = Math.floor(days);
-  console.log(wholeDays, wholeHours, wholeMinutes, seconds, duration);
-  if (wholeDays > 30) {
-    return "> 30 days";
-  }
-  if (wholeDays > 0) {
-    return `${wholeDays} days`;
-  }
-  if (wholeHours > 0) {
-    return `${wholeHours}h`;
-  }
-  if (wholeMinutes > 0) {
-    return `${wholeMinutes}m`;
-  }
-  return `< 1m`;
-}
 
 export const HomePage = () => {
   const navigate = useNavigate();
   const { savedGames } = useSavedPuzzlesStore();
   const recentGames = Object.entries(savedGames).sort((a, b) => {
     return b[1].lastPlayed - a[1].lastPlayed;
-  }).slice(0, 5);
+  }).map(([_, game]) => game).slice(0, 3);
 
   const now = new Date();
   
-  return (
-    <Stack gap={8}>
-      <Stack gap={4}>
-        <h1>Single Digit</h1>
-        <p></p>
-      </Stack>
+  return (<Stack gap={4}>
+    <Layer>
       {recentGames.length > 0 && (
         <Stack gap={4}>
           <h3>Continue</h3>
-            <div className="sudoku-card-container">
-              {recentGames.map(([id, game], i) => {
-                const duration = new Date().getTime() - game.lastPlayed;
-                return (
-                  <ClickableTile 
-                    light
-                    key={id} 
-                    onClick={() => navigate(`/play/${id}`, { state: { resume: true } })}
-                    >
-                      <Stack gap={4}>
-                        <BoardView cells={game.cells} />
-                        <p>{difficultyDescription(game.puzzle.difficulty)}</p>
-                        <p>Last Played: {formatDuration(duration)} ago</p>
-                      </Stack>
-                  </ClickableTile>
-                )
-              })}
-            </div>
-            <CarbonLink href="/history">View All</CarbonLink>
-          </Stack>
+          <SudokuCardList recentGames={recentGames} />
+          <CarbonLink href="/history">View All</CarbonLink>
+        </Stack>
       )}
-      <Stack gap={4}>
-        <h3>New Game</h3>
-        <p>Generate a new puzzle with a given difficulty</p>
-        <ButtonSet stacked>
-          <Button style={{ color: "black" }} size="md" kind="secondary" onClick={() => navigate('/play/difficulty/easy')} renderIcon={Launch}>
-            <p>Easy</p>
-          </Button>
-          <Button style={{ color: "black"}} size="md" kind="secondary" onClick={() => navigate('/play/difficulty/moderate')} renderIcon={Launch}>
-            <p>Moderate</p>
-          </Button>
-          <Button style={{ color: "black"}} size="md" kind="secondary" onClick={() => navigate('/play/difficulty/tough')} renderIcon={Launch}>
-            <p>Tough</p>
-          </Button>
-          <Button style={{ color: "black"}} size="md" kind="secondary" onClick={() => navigate('/play/difficulty/hard')} renderIcon={Launch}>
-            <p>Hard</p>
-          </Button>
-        </ButtonSet>
-      </Stack>
-    </Stack>
-  );
+    </Layer>
+  <h3>New Game</h3>
+  <p>Generate a new puzzle with a given difficulty</p>
+  <ButtonSet stacked>
+    <Button style={{ color: "black" }} size="md" kind="secondary" onClick={() => navigate('/play/difficulty/easy')} renderIcon={Launch}>
+      <p>Easy</p>
+    </Button>
+    <Button style={{ color: "black"}} size="md" kind="secondary" onClick={() => navigate('/play/difficulty/moderate')} renderIcon={Launch}>
+      <p>Moderate</p>
+    </Button>
+    <Button style={{ color: "black"}} size="md" kind="secondary" onClick={() => navigate('/play/difficulty/tough')} renderIcon={Launch}>
+      <p>Tough</p>
+    </Button>
+    <Button style={{ color: "black"}} size="md" kind="secondary" onClick={() => navigate('/play/difficulty/hard')} renderIcon={Launch}>
+      <p>Hard</p>
+    </Button>
+  </ButtonSet>
+  </Stack>);
 }

@@ -59,18 +59,21 @@ export const SudokuPlayer = ({ initialState }: SudokuPlayerProps) => {
     if (selectedIndex !== undefined) {
       const newBoard = produce(state, draft => {
         draft.cells[selectedIndex] = updateFn(draft.cells[selectedIndex]);
+        
         draft.lastPlayed = new Date().getTime();
+
+        if (draft.cells.every(cell => cell.value !== 0)) {
+          const solved = draft.cells.map(cell => cell.value).join('');
+          if (solved === draft.puzzle.solution) {
+            draft.solved = true;
+            setCompletionState(CompletionState.Completed);
+          } else {
+            setCompletionState(CompletionState.Error);
+          }
+        }
       });
       set(newBoard);
       savePuzzle(newBoard);
-      if (newBoard.cells.every(cell => cell.value !== 0)) {
-        const solved = newBoard.cells.map(cell => cell.value).join('');
-        if (solved === newBoard.puzzle.solution) {
-          setCompletionState(CompletionState.Completed);
-        } else {
-          setCompletionState(CompletionState.Error);
-        }
-      } 
     }
   };
 

@@ -1,21 +1,36 @@
 @use './App.scss' as *;
 
-.sudoku-card-container {
+.sudoku-card-list {
   display: flex;
-  flex-wrap: wrap;
+  @media (max-width: 672px) {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    overflow-x: auto;
+    // box-sizing: border-box;
+  }
+  // flex-wrap: nowrap;
+  // overflow-x: auto;
+  // white-space: nowrap;
   gap: 1rem;
+
+  .sudoku-card {
+    // height: auto;
+    // aspect-ratio: 0.8;
+  }
 }
 
 .sudoku-card {
-  height: 240px;
-  aspect-ratio: 0.8;
-  padding: 1rem;
-  border-radius: 1em;
-  background-color: map-get($colours, pale-grey1);
-  border: map-get($colours, black) 1px solid;
-  &:hover {
-    background-color: map-get($colours, pale-green0);
-  }
+  // width: 200px;
+  // aspect-ratio: 0.8;
+  // padding: 1rem;
+  // border-radius: 1em;
+  // background-color: map-get($colours, pale-grey1);
+  // border: map-get($colours, black) 1px solid;
+  // &:hover {
+  //   background-color: map-get($colours, pale-green0);
+  // }
+
+  margin: 1rem auto;
 
   p {
     font-size: 1em;
