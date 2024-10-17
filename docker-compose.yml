@@ -48,7 +48,6 @@ services:
       - ./mongodb/.env
     profiles:
       - dev
-      - prod
 
   mongo-express:
     image: mongo-express:1.0.2
