@@ -16,7 +16,7 @@ const CardView = ({ recentGames }: TableViewProps) => {
     <FlexGrid>
       <Row>
         {recentGames.map((game) => (
-          <Column sm={2} md={2} lg={2} key={game.puzzle.clues}>
+          <Column sm={2} md={2} lg={4} key={game.puzzle.clues}>
             <SudokuCard puzzle={game.puzzle} cells={game.cells} resume />
           </Column>
         ))}

@@ -2,6 +2,7 @@
 
 .sudoku-card-list {
   display: flex;
+  align-items: start;
   @media (max-width: 672px) {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -30,7 +31,7 @@
   //   background-color: map-get($colours, pale-green0);
   // }
 
-  margin: 1rem auto;
+  margin: 0.5rem;
 
   p {
     font-size: 1em;

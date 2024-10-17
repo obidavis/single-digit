@@ -76,6 +76,11 @@ export const PlayerPage = () => {
           setLoading(false);
           const state = freshGameState({ clues, solution, difficulty });
           navigate(`/play/${clues}`, { replace: true, state: { state } });
+        })
+        .catch(() => {
+          const message = "Failed to fetch puzzle";
+          setLoading(false);
+          navigate("/error", { state: { message } });
         });
     } else {
       setLoading(false);
